@@ -1554,6 +1554,33 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* InitializeParent																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Initialize the Parent property in all of the decendants of the
+		/// specified item.
+		/// </summary>
+		/// <param name="action">
+		/// Reference to an action derivative.
+		/// </param>
+		protected static void InitializeParent(ActionItem action)
+		{
+			ActionCollection actions = null;
+
+			if(action != null)
+			{
+				actions = action.mActions;
+				actions.Parent = action;
+				foreach(ActionItem actionItem in actions)
+				{
+					actionItem.Parent = actions;
+					InitializeParent(actionItem);
+				}
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* InitializeProperties																									*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -1926,7 +1953,7 @@ namespace ActionEngine
 		/// <remarks>
 		/// This property is non-inheritable.
 		/// </remarks>
-		public ActionCollection Actions
+		public virtual ActionCollection Actions
 		{
 			get { return mActions; }
 		}
@@ -2460,33 +2487,6 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
-		//* InitializeParent																											*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Initialize the Parent property in all of the decendants of the
-		/// specified item.
-		/// </summary>
-		/// <param name="action">
-		/// Reference to an action derivative.
-		/// </param>
-		public static void InitializeParent(ActionItem action)
-		{
-			ActionCollection actions = null;
-
-			if(action != null)
-			{
-				actions = action.mActions;
-				actions.Parent = action;
-				foreach(ActionItem actionItem in actions)
-				{
-					actionItem.Parent = actions;
-					InitializeParent(actionItem);
-				}
-			}
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
 		//*	InputDir																															*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -2905,7 +2905,7 @@ namespace ActionEngine
 		/// This property is non-inheritable.
 		/// </remarks>
 		[JsonIgnore]
-		public ActionCollection Parent
+		public virtual ActionCollection Parent
 		{
 			get { return mParent; }
 			set { mParent = value; }

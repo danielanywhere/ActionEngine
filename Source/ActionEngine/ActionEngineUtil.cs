@@ -711,7 +711,7 @@ namespace ActionEngine
 
 			if(actionName?.Length > 0)
 			{
-				foreach(string actionNameItem in mRecognizedActions)
+				foreach(string actionNameItem in ActionEngineBase.RecognizedActions)
 				{
 					if(ComparesEqual(actionName, actionNameItem))
 					{
@@ -1039,41 +1039,6 @@ namespace ActionEngine
 				}
 			}
 			return builder.ToString();
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//*	RecognizedActions																											*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Private member for
-		/// <see cref="RecognizedActions">RecognizedActions</see>.
-		/// </summary>
-		private static List<string> mRecognizedActions = new List<string>()
-		{
-			"None",
-			"Batch",
-			"DrawImage",
-			"FileOpenImage",
-			"FileOverlayImage",
-			"FileSaveImage",
-			"ForEachFile",
-			"If",
-			"ImageBackground",
-			"ImagesClear",
-			"OpenWorkingDocument",
-			"RunSequence",
-			"SaveWorkingDocument",
-			"SetWorkingImage",
-			"SizeImage"
-		};
-		/// <summary>
-		/// Get a reference to the collection of recognized actions in this
-		/// session.
-		/// </summary>
-		public static List<string> RecognizedActions
-		{
-			get { return mRecognizedActions; }
 		}
 		//*-----------------------------------------------------------------------*
 
