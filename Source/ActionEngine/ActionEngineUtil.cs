@@ -24,7 +24,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
+using Newtonsoft.Json;
 using SkiaSharp;
 
 namespace ActionEngine
@@ -282,6 +282,33 @@ namespace ActionEngine
 					}
 				}
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* DeepCopy																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a new instance of the provided item.
+		/// </summary>
+		/// <param name="item">
+		/// Reference to the item to be copied.
+		/// </param>
+		/// <returns>
+		/// Reference to a completely new instance of the file action item
+		/// provided by the caller.
+		/// </returns>
+		public static T DeepCopy<T>(T item)
+		{
+			string content = "";
+			T result = default(T);
+
+			if(item != null)
+			{
+				content = JsonConvert.SerializeObject(item);
+				result = JsonConvert.DeserializeObject<T>(content);
+			}
+			return result;
 		}
 		//*-----------------------------------------------------------------------*
 

@@ -60,573 +60,6 @@ namespace ActionEngine
 		//*************************************************************************
 
 		//*-----------------------------------------------------------------------*
-		//*	GetBase																																*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the base number or filename pattern of the source or target
-		/// files, depending upon the action.
-		/// </summary>
-		/// <returns>
-		/// The base number or filename pattern of the source or target files,
-		/// dependending upon the action. This value is inherited.
-		/// </returns>
-		public string GetBase()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.Base;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetCount																															*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the value of the count property from the parent entity.
-		/// </summary>
-		/// <returns>
-		/// The value of the count property in the parent entity, if found.
-		/// Otherwise, 0.
-		/// </returns>
-		public float GetCount()
-		{
-			float result = 0f;
-
-			if(mParent != null)
-			{
-				result = mParent.Count;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetCurrentFile																												*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the value of the CurrentFile property from the parent entity.
-		/// </summary>
-		/// <returns>
-		/// The value of the CurrentFile property in the parent entity, if found.
-		/// Otherwise, null.
-		/// </returns>
-		public FileInfo GetCurrentFile()
-		{
-			FileInfo result = null;
-
-			if(mParent != null)
-			{
-				result = mParent.CurrentFile;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetDataFilename																												*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the DataFilename property from the parent entity.
-		/// </summary>
-		/// <returns>
-		/// Value of the DataFilename property on the parent entity, if found.
-		/// Otherwise, an empty string.
-		/// </returns>
-		public string GetDataFilename()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.DataFilename;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//*	GetDataFiles																													*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return a reference to the collection of file information used as
-		/// reference data in this session.
-		/// </summary>
-		/// <returns>
-		/// A reference to the parent's DataFiles collection, if found. Otherwise,
-		/// an empty collection.
-		/// </returns>
-		public List<FileInfo> GetDataFiles()
-		{
-			List<FileInfo> result = null;
-
-			if(mParent != null)
-			{
-				result = mParent.DataFiles;
-			}
-			else
-			{
-				result = new List<FileInfo>();
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//*	GetDataNames																													*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Get a reference to the list of data filenames or foldernames with
-		/// or without wildcards. This parameter can be specified multiple times
-		/// on the command line with different values to load multiple input files.
-		/// </summary>
-		/// <returns>
-		/// Reference to a list of filenames or folder names, with or without
-		/// wildcards, if present. Otherwise, an empty list. This value is
-		/// inherited.
-		/// </returns>
-		public List<string> GetDataNames()
-		{
-			List<string> result = null;
-
-			if(mParent != null)
-			{
-				//	If this item is not overridden, then default to the parent.
-				result = mParent.DataNames;
-			}
-			else
-			{
-				result = new List<string>();
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetDateTimeValue																											*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the DateTimeValue property of the parent entity.
-		/// </summary>
-		/// <returns>
-		/// The DateTimeValue property value of the parent entity, if found.
-		/// Otherwise, DateTime.MinValue.
-		/// </returns>
-		public DateTime GetDateTimeValue()
-		{
-			DateTime result = DateTime.MinValue;
-
-			if(mParent != null)
-			{
-				result = mParent.DateTimeValue;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetDigits																															*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the Digits property from the parent entity.
-		/// </summary>
-		/// <returns>
-		/// The value of the Digits property on the parent entity, if found.
-		/// Otherwise, 0.
-		/// </returns>
-		public int GetDigits()
-		{
-			int result = 0;
-
-			if(mParent != null)
-			{
-				result = mParent.Digits;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetInputFilename																											*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the InputFilename property from the parent entity.
-		/// </summary>
-		/// <returns>
-		/// Value of the InputFilename property on the parent entity, if found.
-		/// Otherwise, an empty string.
-		/// </returns>
-		public string GetInputFilename()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.InputFilename;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//*	GetInputFiles																													*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return a reference to the collection of file information used as input
-		/// in this session.
-		/// </summary>
-		/// <returns>
-		/// A reference to the parent's InputFiles collection, if found. Otherwise,
-		/// an empty collection.
-		/// </returns>
-		public List<FileInfo> GetInputFiles()
-		{
-			List<FileInfo> result = null;
-
-			if(mParent != null)
-			{
-				result = mParent.InputFiles;
-			}
-			else
-			{
-				result = new List<FileInfo>();
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetInputFolderName																										*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the InputFolderName property value from the parent entity.
-		/// </summary>
-		/// <returns>
-		/// Value of the InputFolderName property on the parent entity, if found.
-		/// Otherwise, an empty string.
-		/// </returns>
-		public string GetInputFolderName()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.InputFolderName;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//*	GetInputNames																													*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Get a reference to the list of filenames or foldernames with
-		/// or without wildcards. This parameter can be specified multiple times
-		/// on the command line with different values to load multiple input files.
-		/// </summary>
-		/// <returns>
-		/// Reference to a list of filenames or folder names, with or without
-		/// wildcards, if present. Otherwise, an empty list. This value is
-		/// inherited.
-		/// </returns>
-		public List<string> GetInputNames()
-		{
-			List<string> result = null;
-
-			if(mParent != null)
-			{
-				//	If this item is not overridden, then default to the parent.
-				result = mParent.InputNames;
-			}
-			else
-			{
-				result = new List<string>();
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetOptionByName																												*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the option specified by name from a parent entity.
-		/// </summary>
-		/// <param name="collection">
-		/// Reference to the collection for which the option is being found.
-		/// </param>
-		/// <param name="optionName">
-		/// Name of the option to retrieve.
-		/// </param>
-		/// <returns>
-		/// Reference to the specified option, if found. Otherwise, null.
-		/// </returns>
-		public static ActionOptionItem GetOptionByName(
-			ActionCollection collection, string optionName)
-		{
-			ActionOptionItem result = null;
-
-			if(collection != null && collection.mParent != null)
-			{
-				result = ActionItem.GetOptionByName(
-					collection.mParent, optionName);
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetOutputFolderName																										*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the value of the OutputFolderName property on the parent entity.
-		/// </summary>
-		/// <returns>
-		/// Value of the OutputFolderName property on the parent entity, if found.
-		/// Otherwise, an empty string.
-		/// </returns>
-		public string GetOutputFolderName()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.OutputFolderName;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetOutputName																													*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the value of the OutputName property on the parent entity.
-		/// </summary>
-		/// <returns>
-		/// Value of the OutputName property on the parent entity, if found.
-		/// Otherwise, and empty string.
-		/// </returns>
-		public string GetOutputName()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.OutputName;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		////*-----------------------------------------------------------------------*
-		////* GetOutputType																													*
-		////*-----------------------------------------------------------------------*
-		///// <summary>
-		///// Return the value of the OutputType property on the parent entity.
-		///// </summary>
-		///// <returns>
-		///// The value of the OutputType property on the parent entity, if found.
-		///// Otherwise, RenderFileTypeEnum.Auto.
-		///// </returns>
-		//public RenderFileTypeEnum GetOutputType()
-		//{
-		//	RenderFileTypeEnum result = RenderFileTypeEnum.Auto;
-
-		//	if(mParent != null)
-		//	{
-		//		result = mParent.OutputType;
-		//	}
-		//	return result;
-		//}
-		////*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetPattern																														*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the value of the Pattern property on the parent entity.
-		/// </summary>
-		/// <returns>
-		/// The value of the Pattern property on the parent entity, if found.
-		/// Otherwise, an empty string.
-		/// </returns>
-		public string GetPattern()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.Pattern;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetRange																															*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return a reference to the Range property on the parent entity.
-		/// </summary>
-		/// <returns>
-		/// Reference to the Range property on the parent entity, if found.
-		/// Otherwise, null.
-		/// </returns>
-		public StartEndItem GetRange()
-		{
-			StartEndItem result = null;
-
-			if(mParent != null)
-			{
-				result = mParent.Range;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetSourceFolderName																										*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the SourceFolderName property value from the parent entity.
-		/// </summary>
-		/// <returns>
-		/// Value of the SourceFolderName property on the parent entity, if found.
-		/// Otherwise, an empty string.
-		/// </returns>
-		public string GetSourceFolderName()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.SourceFolderName;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		////*-----------------------------------------------------------------------*
-		////*	GetStyleWorksheets																										*
-		////*-----------------------------------------------------------------------*
-		///// <summary>
-		///// Return the nearest instance of style extension worksheets on this
-		///// session.
-		///// </summary>
-		///// <returns>
-		///// Reference to a list of style worksheets on this session, if found.
-		///// Otherwise, an empty string. This value is inherited.
-		///// </returns>
-		//public List<string> GetStyleWorksheets()
-		//{
-		//	List<string> result = null;
-
-		//	if(mParent != null)
-		//	{
-		//		result = mParent.StyleWorksheets;
-		//	}
-		//	return result;
-		//}
-		////*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetText																																*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the value of the Text property from the parent entity.
-		/// </summary>
-		/// <returns>
-		/// Value of the Text property on the parent entity, if found. Otherwise,
-		/// an empty string.
-		/// </returns>
-		public string GetText()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.Text;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//*	GetWorkingPath																												*
-		//*-----------------------------------------------------------------------*
-		//private string mWorkingPath = "";
-		/// <summary>
-		/// Return the working path for operations in this instance.
-		/// </summary>
-		/// <returns>
-		/// The current working path, if defined. Otherwise, an empty string.
-		/// This value is inherited.
-		/// </returns>
-		public string GetWorkingPath()
-		{
-			string result = "";
-
-			if(mParent != null)
-			{
-				result = mParent.WorkingPath;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//*	GetWorkingDocument																										*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the working document file for operations in this instance.
-		/// </summary>
-		/// <returns>
-		/// Reference to the document document object active in this instance, if
-		/// found. Otherwise, null. This value is inherited.
-		/// </returns>
-		public ActionDocumentItem GetWorkingDocument()
-		{
-			ActionDocumentItem result = null;
-
-			if(mParent != null)
-			{
-				result = mParent.WorkingDocument;
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* InitializeParent																											*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Initialize the Parent property in all of the decendants of the
-		/// specified collection.
-		/// </summary>
-		/// <param name="actions">
-		/// Reference to a collection of actions.
-		/// </param>
-		public static void InitializeParent(
-			ActionCollection actions)
-		{
-			if(actions?.Count > 0)
-			{
-				foreach(ActionItem actionItem in actions)
-				{
-					actionItem.Parent = actions;
-					actionItem.Actions.Parent = actionItem;
-					InitializeParent(actionItem.Actions);
-				}
-			}
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
 		//*	Parent																																*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -642,7 +75,7 @@ namespace ActionEngine
 			get { return mParent; }
 			set
 			{
-				//	NOTE: This is stupid because Newtonsoft JSON ...
+				//	NOTE: This is only stupid because Newtonsoft JSON ...
 				//	bypasses an overridden Add(Item) method.
 				mParent = value;
 				foreach(ActionItem actionItem in this)
@@ -1154,6 +587,21 @@ namespace ActionEngine
 				item.mParent.Parent.mInputFiles.Clear();
 			}
 		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* DeserializeFile																												*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Deserialize the contents of the supplied file.
+		/// </summary>
+		/// <param name="content">
+		/// The JSON file content to deserialize.
+		/// </param>
+		/// <returns>
+		/// The deserialized top action from the file.
+		/// </returns>
+		protected abstract ActionItem DeserializeFile(string content);
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
@@ -2506,9 +1954,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetBase();
+						result = mParent.Parent.Base;
 					}
 					else
 					{
@@ -2581,9 +2029,9 @@ namespace ActionEngine
 
 				if(result == float.MinValue)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetCount();
+						result = mParent.Parent.Count;
 					}
 					else
 					{
@@ -2615,9 +2063,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetCurrentFile();
+						result = mParent.Parent.CurrentFile;
 					}
 				}
 				return result;
@@ -2666,9 +2114,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetDataFilename();
+						result = mParent.Parent.DataFilename;
 					}
 					else
 					{
@@ -2702,9 +2150,12 @@ namespace ActionEngine
 			{
 				List<FileInfo> result = mDataFiles;
 
-				if(result.Count == 0 && mParent != null)
+				if(result.Count == 0)
 				{
-					result = mParent.GetDataFiles();
+					if(mParent?.Parent != null)
+					{
+						result = mParent.Parent.DataFiles;
+					}
 				}
 				return result;
 			}
@@ -2733,11 +2184,11 @@ namespace ActionEngine
 			{
 				List<string> result = mDataNames;
 
-				if(result.Count == 0 && mParent != null)
+				if(result.Count == 0 && mParent?.Parent != null)
 				{
 					//	If the local list is not overridden, then default to the
 					//	parent.
-					result = mParent.GetDataNames();
+					result = mParent.Parent.DataNames;
 				}
 				return result;
 			}
@@ -2764,42 +2215,13 @@ namespace ActionEngine
 			{
 				DateTime result = mDateTimeValue;
 
-				if(result == DateTime.MinValue && mParent != null)
+				if(result == DateTime.MinValue && mParent?.Parent != null)
 				{
-					result = mParent.GetDateTimeValue();
+					result = mParent.Parent.DateTimeValue;
 				}
 				return result;
 			}
 			set { mDateTimeValue = value; }
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* DeepCopy																															*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return a new instance of the provided item.
-		/// </summary>
-		/// <param name="item">
-		/// Reference to the item to be copied.
-		/// </param>
-		/// <returns>
-		/// Reference to a completely new instance of the file action item
-		/// provided by the caller.
-		/// </returns>
-		public static ActionItem DeepCopy(
-			ActionItem item)
-		{
-			string content = "";
-			ActionItem result = null;
-
-			if(item != null)
-			{
-				content = JsonConvert.SerializeObject(item);
-				result =
-					JsonConvert.DeserializeObject<ActionItem>(content);
-			}
-			return result;
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2824,9 +2246,9 @@ namespace ActionEngine
 
 				if(result == int.MinValue)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetDigits();
+						result = mParent.Parent.Digits;
 					}
 					else
 					{
@@ -2904,10 +2326,9 @@ namespace ActionEngine
 			{
 				result = item.Options.FirstOrDefault(x =>
 					x.Name.ToLower() == optionName.ToLower());
-				if(result == null && item.mParent != null)
+				if(result == null && item.mParent.Parent != null)
 				{
-					result = ActionCollection.GetOptionByName(
-						item.mParent, optionName);
+					result = GetOptionByName(item.mParent.Parent, optionName);
 				}
 			}
 			return result;
@@ -3039,6 +2460,33 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* InitializeParent																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Initialize the Parent property in all of the decendants of the
+		/// specified item.
+		/// </summary>
+		/// <param name="action">
+		/// Reference to an action derivative.
+		/// </param>
+		public static void InitializeParent(ActionItem action)
+		{
+			ActionCollection actions = null;
+
+			if(action != null)
+			{
+				actions = action.mActions;
+				actions.Parent = action;
+				foreach(ActionItem actionItem in actions)
+				{
+					actionItem.Parent = actions;
+					InitializeParent(actionItem);
+				}
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	InputDir																															*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -3078,9 +2526,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetInputFilename();
+						result = mParent.Parent.InputFilename;
 					}
 					else
 					{
@@ -3114,9 +2562,9 @@ namespace ActionEngine
 			{
 				List<FileInfo> result = mInputFiles;
 
-				if(result.Count == 0 && mParent != null)
+				if(result.Count == 0 && mParent?.Parent != null)
 				{
-					result = mParent.GetInputFiles();
+					result = mParent.Parent.InputFiles;
 				}
 				return result;
 			}
@@ -3145,9 +2593,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetInputFolderName();
+						result = mParent.Parent.InputFolderName;
 					}
 					else
 					{
@@ -3182,11 +2630,11 @@ namespace ActionEngine
 			{
 				List<string> result = mInputNames;
 
-				if(result.Count == 0 && mParent != null)
+				if(result.Count == 0 && mParent?.Parent != null)
 				{
 					//	If the local list is not overridden, then default to the
 					//	parent.
-					result = mParent.GetInputNames();
+					result = mParent.Parent.InputNames;
 				}
 				return result;
 			}
@@ -3351,9 +2799,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetOutputFolderName();
+						result = mParent.Parent.OutputFolderName;
 					}
 					else
 					{
@@ -3391,9 +2839,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetOutputName();
+						result = mParent.Parent.OutputName;
 					}
 					else
 					{
@@ -3483,9 +2931,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetPattern();
+						result = mParent.Parent.Pattern;
 					}
 					else
 					{
@@ -3540,9 +2988,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetRange();
+						result = mParent.Parent.Range;
 					}
 					else
 					{
@@ -3631,7 +3079,8 @@ namespace ActionEngine
 					{
 						try
 						{
-							topItem = JsonConvert.DeserializeObject<ActionItem>(content);
+							topItem = DeserializeFile(content);
+							//topItem = JsonConvert.DeserializeObject<ActionItem>(content);
 							if(ComparesEqual(topItem.Action, "batch"))
 							{
 								//	All of the top item information is added to this item.
@@ -3650,7 +3099,7 @@ namespace ActionEngine
 								this.Actions.Add(topItem);
 							}
 							this.Actions.Parent = this;
-							ActionCollection.InitializeParent(this.Actions);
+							InitializeParent(this);
 						}
 						catch(Exception ex)
 						{
@@ -3857,9 +3306,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetSourceFolderName();
+						result = mParent.Parent.SourceFolderName;
 					}
 					else
 					{
@@ -3944,9 +3393,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetText();
+						result = mParent.Parent.Text;
 					}
 					else
 					{
@@ -3977,9 +3426,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetWorkingDocument();
+						result = mParent.Parent.WorkingDocument;
 					}
 				}
 				return result;
@@ -4038,9 +3487,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(mParent?.Parent != null)
 					{
-						result = mParent.GetWorkingPath();
+						result = mParent.Parent.WorkingPath;
 					}
 					else
 					{
