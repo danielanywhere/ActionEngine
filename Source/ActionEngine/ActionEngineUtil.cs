@@ -694,37 +694,6 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
-		//* GetActionName																													*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return the predefined version of the caller-supplied action name.
-		/// </summary>
-		/// <param name="actionName">
-		/// Casual name of the action to look up.
-		/// </param>
-		/// <returns>
-		/// Formal name of the specified action, if found.
-		/// </returns>
-		public static string GetActionName(string actionName)
-		{
-			string result = "None";
-
-			if(actionName?.Length > 0)
-			{
-				foreach(string actionNameItem in ActionEngineBase.RecognizedActions)
-				{
-					if(ComparesEqual(actionName, actionNameItem))
-					{
-						result = actionNameItem;
-						break;
-					}
-				}
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
 		//* GetExtension																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>

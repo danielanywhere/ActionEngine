@@ -2338,6 +2338,37 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetActionName																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the predefined version of the caller-supplied action name.
+		/// </summary>
+		/// <param name="actionName">
+		/// Casual name of the action to look up.
+		/// </param>
+		/// <returns>
+		/// Formal name of the specified action, if found.
+		/// </returns>
+		public static string GetActionName(string actionName)
+		{
+			string result = "None";
+
+			if(actionName?.Length > 0)
+			{
+				foreach(string actionNameItem in mRecognizedActions)
+				{
+					if(ComparesEqual(actionName, actionNameItem))
+					{
+						result = actionNameItem;
+						break;
+					}
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* GetConditions																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -2408,19 +2439,6 @@ namespace ActionEngine
 			return result;
 		}
 		//*-----------------------------------------------------------------------*
-
-		////*-----------------------------------------------------------------------*
-		////* GetParentAction																												*
-		////*-----------------------------------------------------------------------*
-		///// <summary>
-		///// Return a reference to the parent of this action.
-		///// </summary>
-		///// <returns>
-		///// Reference to the parent action of this action, if defined. Otherwise,
-		///// null.
-		///// </returns>
-		//public abstract ActionItemBase GetParentAction();
-		////*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//* GetPropertyByName																											*
@@ -3062,25 +3080,40 @@ namespace ActionEngine
 		}
 		//*-----------------------------------------------------------------------*
 
-		////*-----------------------------------------------------------------------*
-		////*	RectangleInfoList																											*
-		////*-----------------------------------------------------------------------*
-		///// <summary>
-		///// Private member for
-		///// <see cref="RectangleInfoList">RectangleInfoList</see>.
-		///// </summary>
-		//private static RectangleInfoCollection mRectangleInfoList =
-		//	new RectangleInfoCollection();
-		///// <summary>
-		///// Get a reference to the collection of rectangle info items in this
-		///// session.
-		///// </summary>
-		//[JsonIgnore]
-		//public static RectangleInfoCollection RectangleInfoList
-		//{
-		//	get { return mRectangleInfoList; }
-		//}
-		////*-----------------------------------------------------------------------*
+		//*-----------------------------------------------------------------------*
+		//*	RecognizedActions																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for
+		/// <see cref="RecognizedActions">RecognizedActions</see>.
+		/// </summary>
+		private static List<string> mRecognizedActions = new List<string>()
+		{
+			"None",
+			"Batch",
+			"DrawImage",
+			"FileOpenImage",
+			"FileOverlayImage",
+			"FileSaveImage",
+			"ForEachFile",
+			"If",
+			"ImageBackground",
+			"ImagesClear",
+			"OpenWorkingDocument",
+			"RunSequence",
+			"SaveWorkingDocument",
+			"SetWorkingImage",
+			"SizeImage"
+		};
+		/// <summary>
+		/// Get a reference to the collection of recognized actions in this
+		/// session.
+		/// </summary>
+		public static List<string> RecognizedActions
+		{
+			get { return mRecognizedActions; }
+		}
+		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//*	Run																																		*
