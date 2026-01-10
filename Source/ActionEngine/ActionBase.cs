@@ -2488,7 +2488,7 @@ namespace ActionEngine
 		//* GetSpecifiedOrWorking																									*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
-		/// Return a reference either to the PowerPoint specified in the local file
+		/// Return a reference either to the document specified in the local file
 		/// arguments or the previously loaded working document.
 		/// </summary>
 		/// <param name="item">
@@ -2496,10 +2496,9 @@ namespace ActionEngine
 		/// be found.
 		/// </param>
 		/// <returns>
-		/// Reference to the PowerPoint document found, if successul. Otherwise,
-		/// null.
+		/// Reference to the document found, if successul. Otherwise, null.
 		/// </returns>
-		private static ActionDocumentItem GetSpecifiedOrWorking(TAction item)
+		public static ActionDocumentItem GetSpecifiedOrWorking(TAction item)
 		{
 			string content = "";
 			ActionDocumentItem doc = null;
@@ -2522,6 +2521,38 @@ namespace ActionEngine
 				}
 			}
 			return doc;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* GetVariable																														*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Get the value of the specified variable on the provided item instance.
+		/// </summary>
+		/// <param name="item">
+		/// Reference to the item whose variable will be read.
+		/// </param>
+		/// <param name="name">
+		/// Name of the variable to read.
+		/// </param>
+		public static string GetVariable(TAction item, string name)
+		{
+			string result = "";
+			VariableItem variable = null;
+			VariableCollection variables = null;
+
+			if(item != null)
+			{
+				variables = item.Variables;
+				variable = variables.FirstOrDefault(x =>
+					StringComparer.OrdinalIgnoreCase.Equals(x.Name, name));
+				if(variable?.Value != null)
+				{
+					result = variable.Value;
+				}
+			}
+			return result;
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -3275,6 +3306,9 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 		//*	Sequences																															*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Sequences">Sequences</see>.
+		/// </summary>
 		private SequenceCollection<TAction> mSequences =
 			new SequenceCollection<TAction>();
 		/// <summary>
@@ -3294,6 +3328,30 @@ namespace ActionEngine
 					result = Parent.Parent.Sequences;
 				}
 				return result;
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* SetVariable																														*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Set the value of the specified variable on the provided item instance.
+		/// </summary>
+		/// <param name="item">
+		/// Reference to the item whose variable will be set.
+		/// </param>
+		/// <param name="name">
+		/// Name of the variable to update.
+		/// </param>
+		/// <param name="value">
+		/// Value to place on the variable.
+		/// </param>
+		public static void SetVariable(TAction item, string name, string value)
+		{
+			if(item != null)
+			{
+				item.mVariables.SetValue(name, value);
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -3683,6 +3741,22 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeVariableName																						*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the VariableName property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeVariableName()
+		{
+			return mVariableName?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	ShouldSerializeWorkingDocumentIndex																		*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -3856,6 +3930,83 @@ namespace ActionEngine
 				return result;
 			}
 			set { mText = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	VariableName																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="VariableName">VariableName</see>.
+		/// </summary>
+		private string mVariableName = "";
+		/// <summary>
+		/// Get/Set the name of the variable to access.
+		/// </summary>
+		/// <remarks>
+		/// This property is inheritable.
+		/// </remarks>
+		public string VariableName
+		{
+			get
+			{
+				string result = mVariableName;
+
+				if(result == null)
+				{
+					if(Parent?.Parent != null)
+					{
+						result = Parent.Parent.VariableName;
+					}
+					else
+					{
+						result = "";
+					}
+				}
+				return result;
+			}
+			set { mVariableName = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	Variables																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Variables">Variables</see>.
+		/// </summary>
+		private VariableCollection mVariables = new VariableCollection();
+		/// <summary>
+		/// Get a reference to the collection of variables on this instance.
+		/// </summary>
+		/// <remarks>
+		/// The values of this collection are combinatorially inherited.
+		/// Values at an inner level locally override values at an outer level.
+		/// </remarks>
+		[JsonIgnore]
+		public VariableCollection Variables
+		{
+			get
+			{
+				List<VariableItem> inheritedVariables = null;
+				VariableCollection variables = new VariableCollection();
+
+				variables.AddRange(mVariables);
+				if(Parent?.Parent != null)
+				{
+					inheritedVariables = Parent.Parent.Variables;
+					foreach(VariableItem variableItem in inheritedVariables)
+					{
+						if(!variables.Exists(x =>
+							StringComparer.OrdinalIgnoreCase.Equals(
+								x.Name, variableItem.Name)))
+						{
+							variables.Add(variableItem);
+						}
+					}
+				}
+				return variables;
+			}
 		}
 		//*-----------------------------------------------------------------------*
 

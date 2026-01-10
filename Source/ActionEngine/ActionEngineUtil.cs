@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -975,6 +976,37 @@ namespace ActionEngine
 					mAbsIndex.Any(x => pathName.IndexOf(x) > -1);
 			}
 			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* LogAppend																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Output a line to the log as well as to the caller-supplied string
+		/// builder.
+		/// </summary>
+		/// <param name="builder">
+		/// Reference to the string builder that will receive the line.
+		/// </param>
+		/// <param name="line">
+		/// Line to output to the log and to the builder.
+		/// </param>
+		public static void LogAppend(StringBuilder builder, string line)
+		{
+			if(builder != null)
+			{
+				if(line?.Length > 0)
+				{
+					builder.AppendLine(line);
+					Trace.WriteLine(line);
+				}
+				else
+				{
+					builder.AppendLine();
+					Trace.WriteLine("");
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
