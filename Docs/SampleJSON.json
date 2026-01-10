@@ -1,0 +1,22 @@
+{
+	"WorkingPath": "C:\\Temp\\Audio",
+	"InputFilename": "*.mp3",
+	"Action": "ForEachFile",
+	"Actions":
+	[
+		{
+			"Remark": "These actions are demo implementation-level samples.",
+			"Action": "ProcessAudio-FirstPass",
+			"Settings": "First;pass;settings"
+		},
+		{
+			"Action": "ProcessAudio-SecondPass",
+			"Settings": "Second;pass;settings"
+		},
+		{
+			"Action": "ProcessAudio-ThirdPass",
+			"Settings": "Third;pass;settings"
+		}
+	]
+}
+

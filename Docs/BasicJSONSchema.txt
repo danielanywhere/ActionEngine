@@ -1,0 +1,59 @@
+ActionItem
+{
+	Action: string,
+	Actions: ActionItem[],
+	Base: string,
+	Conditions: ConditionItem[],
+	ConfigFilename: string,
+	Count: float,
+	DataFilename: string,
+	DataNames: string[],
+	DateTimeValue: DateTime,
+	Digits: int,
+	InputFilename: string,
+	InputFolderName: string,
+	InputNames: string[],
+	Message: string,
+	Options: ActionOptionItem[],
+	OutputFilename: string,
+	OutputFolderName: string,
+	OutputName: string,
+	Pattern: string,
+	Properties: NameValueItem[],
+	Range: StartEndItem,
+	Sequences: SequenceItem[],
+	SourceFolderName: string,
+	Text: string,
+	WorkingPath: string
+}
+
+ActionOptionItem
+{
+	Name: string,
+	Value: string
+}
+
+ConditionItem
+{
+	Assignment: string,
+	ConditionItem: string
+}
+
+NameValueItem
+{
+	Name: string,
+	Value: string
+}
+
+SequenceItem
+{
+	Name: string,
+	Actions: ActionItem[]
+}
+
+StartEndItem
+{
+	StartValue: string
+	EndValue: string,
+}
+

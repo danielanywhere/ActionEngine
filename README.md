@@ -71,6 +71,249 @@ You are also able to perform the various general activities with built-in featur
 
 <p>&nbsp;</p>
 
+## Basic Schema
+
+Configuration data can be loaded from and saved to a JSON-formatted text file. The following schema represents the generic base of the library itself. Any public properties you add to your own implementation class will automatically be added to this schema.
+
+```json
+ActionItem
+{
+	Action: string,
+	Actions: ActionItem[],
+	Base: string,
+	Conditions: ConditionItem[],
+	ConfigFilename: string,
+	Count: float,
+	DataFilename: string,
+	DataNames: string[],
+	DateTimeValue: DateTime,
+	Digits: int,
+	InputFilename: string,
+	InputFolderName: string,
+	InputNames: string[],
+	Message: string,
+	Options: ActionOptionItem[],
+	OutputFilename: string,
+	OutputFolderName: string,
+	OutputName: string,
+	Pattern: string,
+	Properties: NameValueItem[],
+	Range: StartEndItem,
+	Sequences: SequenceItem[],
+	SourceFolderName: string,
+	Text: string,
+	WorkingPath: string
+}
+
+ActionOptionItem
+{
+	Name: string,
+	Value: string
+}
+
+ConditionItem
+{
+	Assignment: string,
+	ConditionItem: string
+}
+
+NameValueItem
+{
+	Name: string,
+	Value: string
+}
+
+SequenceItem
+{
+	Name: string,
+	Actions: ActionItem[]
+}
+
+StartEndItem
+{
+	StartValue: string
+	EndValue: string,
+}
+
+
+```
+
+<p>&nbsp;</p>
+
+### Example JSON File
+
+Following is an example of a basic JSON file using the above schema.
+
+```json
+{
+	"WorkingPath": "C:\\Temp\\Audio",
+	"InputFilename": "*.mp3",
+	"Action": "ForEachFile",
+	"Actions":
+	[
+		{
+			"Remark": "These actions are demo implementation-level samples.",
+			"Action": "ProcessAudio-FirstPass",
+			"Settings": "First;pass;settings"
+		},
+		{
+			"Action": "ProcessAudio-SecondPass",
+			"Settings": "Second;pass;settings"
+		},
+		{
+			"Action": "ProcessAudio-ThirdPass",
+			"Settings": "Third;pass;settings"
+		}
+	]
+}
+
+
+```
+
+<p>&nbsp;</p>
+
+## Implementing Your Class
+
+The action item and collection base classes are generic and abstract, meaning that you must create your own concrete implementations of each one. Because of the recursive nature of the action, the item and collection are implemented as a pair, so when you plan to use one, you will need to define both. However, only your inherited item will require internal code implementation.
+
+Following are typical examples of definitions for the item and collection classes.
+
+<p>&nbsp;</p>
+
+### Collection Implementation
+
+The collection doesn't require any implementation in the class body. It is provided to seal the loop for the Curiously Recurring Template Pattern (CRTP).
+
+```csharp
+//*-------------------------------------------------------------------------*
+//* MyActionCollection                                                      *
+//*-------------------------------------------------------------------------*
+/// <summary>
+/// Collection of MyActionItem Items.
+/// </summary>
+public class MyActionCollection :
+ ActionCollectionBase<MyActionItem, MyActionCollection>
+{
+}
+//*-------------------------------------------------------------------------*
+
+```
+
+<p>&nbsp;</p>
+
+### Item Implementation
+
+The following item definition contains a few superfluous lines to demonstrate a primitive version of a concrete class that inherits the complete functionality of the ActionEngine.
+
+```csharp
+//*-------------------------------------------------------------------------*
+//* MyActionItem                                                            *
+//*-------------------------------------------------------------------------*
+/// <summary>
+/// Information about an individual concrete item.
+/// </summary>
+public class MyActionItem : ActionItemBase<MyActionItem, MyActionCollection>
+{
+ //*************************************************************************
+ //* Private                                                               *
+ //*************************************************************************
+ //*-----------------------------------------------------------------------*
+ //* ProcessAudio                                                          *
+ //*-----------------------------------------------------------------------*
+ /// <summary>
+ /// Demo method. Process an audio pass.
+ /// </summary>
+ /// <param name="item">
+ /// Reference to the action item containing processing information.
+ /// </param>
+ /// <param name="passIndex">
+ /// The logical pass to process.
+ /// </param>
+ private void ProcessAudio(MyActionItem item, int passIndex)
+ {
+  // ...
+ }
+ //*-----------------------------------------------------------------------*
+
+ //*************************************************************************
+ //* Protected                                                             *
+ //*************************************************************************
+ //*-----------------------------------------------------------------------*
+ //* RunCustomAction                                                       *
+ //*-----------------------------------------------------------------------*
+ /// <summary>
+ /// Run your custom actions by overriding this method.
+ /// </summary>
+ protected override void RunCustomAction()
+ {
+  string action = Action.ToLower();
+
+  switch(action)
+  {
+   case "processaudio-firstpass":
+    ProcessAudio(this, 1);
+    break;
+   case "processaudio-secondpass":
+    ProcessAudio(this, 2);
+    break;
+   case "processaudio-thirdpass":
+    ProcessAudio(this, 3);
+    break;
+  }
+ }
+ //*-----------------------------------------------------------------------*
+
+ //*-----------------------------------------------------------------------*
+ //* WriteLocalOutput                                                      *
+ //*-----------------------------------------------------------------------*
+ /// <summary>
+ /// Override to write the local output of this operation during a step.
+ /// </summary>
+ protected override void WriteLocalOutput()
+ {
+  base.WriteLocalOutput();
+ }
+ //*-----------------------------------------------------------------------*
+
+ //*************************************************************************
+ //* Public                                                                *
+ //*************************************************************************
+
+ /*
+ // Add any of your own public properties to include them in the JSON
+ // schema for your class. If you wish to make those properties inheritable
+ // from inner levels, use a technique similar to the following.
+
+ public string MyInheritableValue
+ {
+  get
+  {
+   string result = mMyInheritableValue;
+
+   if(string.IsNulllOrEmpty(result))
+   {
+    if(Parent?.Parent != null)
+    {
+     result = Parent.Parent.MyInheritableValue;
+    }
+    else
+    {
+     result = "";
+    }
+   }
+   return result;
+  }
+ }
+
+ */
+
+}
+//*-------------------------------------------------------------------------*
+
+```
+
+<p>&nbsp;</p>
+
 ## Example Host Application
 
 Following is a working example from my soon-to-be-published project PPCL.
@@ -127,9 +370,15 @@ namespace PPCL
 
       Console.WriteLine("PPCL.exe");
 
-      ActionEngine.ActionEngineUtil.RecognizedActions.AddRange(new string[]
+      ActionEngineBase.RecognizedActions.AddRange(new string[]
       {
-        "SlideReport"
+       "AlignLeft",
+       "ChangeImage",
+       "DistributeVertically",
+       "FindObjects",
+       "GetMaxY",
+       "GetMinX",
+       "SlideReport"
       });
 
       prg.mActionItem = new PActionItem();

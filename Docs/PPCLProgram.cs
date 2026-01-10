@@ -49,9 +49,15 @@ namespace PPCL
 
       Console.WriteLine("PPCL.exe");
 
-      ActionEngine.ActionEngineUtil.RecognizedActions.AddRange(new string[]
+      ActionEngineBase.RecognizedActions.AddRange(new string[]
       {
-        "SlideReport"
+       "AlignLeft",
+       "ChangeImage",
+       "DistributeVertically",
+       "FindObjects",
+       "GetMaxY",
+       "GetMinX",
+       "SlideReport"
       });
 
       prg.mActionItem = new PActionItem();
