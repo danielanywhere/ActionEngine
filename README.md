@@ -350,7 +350,7 @@ using ActionEngine;
 using Newtonsoft.Json;
 using StyleAgnosticCommandArgs;
 
-namespace PPCL
+namespace AudioProcessor
 {
  //*-------------------------------------------------------------------------*
  //* Program                                                                 *
