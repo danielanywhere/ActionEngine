@@ -8,6 +8,28 @@ Among other things that will be documented soon, the following features are buil
 
 <p>&nbsp;</p>
 
+## Built-In Actions
+
+The following actions are built-in to the **Action** property of the Action item base.
+
+-   **None**. Placeholder for action unknown or not selected. In this version, the Action property might also be blank or null, since it is a normal string. However, all of those conditions are counted as 'None'.
+-   **Batch**. Perform a batch of file operations from a single configuration file.
+-   **DrawImage**. Draw the image specified by ImageName onto the working image at the location specified by user properties Left and Top.
+-   **FileOpenImage**. Open the image file specified in the current input file. Name it in the local images collection with the name specified in the user property ImageName.
+-   **FileOverlayImage**. Open each image from the range and place the image specified in InputFilename at the options specified by Left, Top, Width, and Height.
+-   **FileSaveImage**. Save the working image to the currently specified OutputFile.
+-   **ForEachFile**. Run the Actions collection of the action through all of the files currently loaded in the InputFiles collection, setting the CurrentFile property for each pass.
+-   **If**. Run one or more sets of actions if their conditions are true. In this version, each condition is an expression that evaluates to true or false, able to use the public static methods of System.Math, and the values of the local variables CurrentFilename and CurrentFileNumber.
+-   **ImageBackground**. Set the background color of the working image, overlaying the previous contents to create the new background.
+-   **ImagesClear**. Clear all images from the Images collection.
+-   **OpenWorkingDocument**. Open the working document. In this version, the working document is seen as being a transitive document. In other words, its purpose is slightly different than either the input or output files in that multiple input files might be used to apply changes to the working document, and the working document itself might be converted before being saved as the output document.
+-   **RunSequence**. Run the sequence specified in the 'SequenceName' user property.
+-   **SaveWorkingDocument**. Save the working document.
+-   **SetWorkingImage**. Set the current working image to the one with the local name found in the user property ImageName.
+-   **SizeImage**. Scale the image to a new size, as specified in user properties Width and Height.
+
+<p>&nbsp;</p>
+
 ## Multi-Level Action Handling
 
 At any step, an action of type: Batch can be used to define a series of other actions, which can either reside in the Actions property of that action or within a separate JSON-formatted configuration file.
