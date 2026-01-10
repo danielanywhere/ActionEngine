@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace ActionEngine
@@ -28,7 +29,7 @@ namespace ActionEngine
 	/// <summary>
 	/// Collection of SequenceItem Items.
 	/// </summary>
-	public class SequenceCollection : List<SequenceItem>
+	public class SequenceCollection<TAction> : List<SequenceItem<TAction>>
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -50,7 +51,7 @@ namespace ActionEngine
 	/// <summary>
 	/// Individual sequence.
 	/// </summary>
-	public class SequenceItem
+	public class SequenceItem<TAction>
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -67,12 +68,11 @@ namespace ActionEngine
 		/// <summary>
 		/// Private member for <see cref="Actions">Actions</see>.
 		/// </summary>
-		private ActionCollection mActions =
-			new ActionCollection();
+		private List<TAction> mActions = new List<TAction>();
 		/// <summary>
 		/// Get a reference to the collection of actions on this sequence.
 		/// </summary>
-		public ActionCollection Actions
+		public List<TAction> Actions
 		{
 			get { return mActions; }
 		}

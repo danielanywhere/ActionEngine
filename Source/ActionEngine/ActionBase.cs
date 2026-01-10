@@ -42,12 +42,15 @@ using static ActionEngine.ActionEngineUtil;
 namespace ActionEngine
 {
 	//*-------------------------------------------------------------------------*
-	//*	ActionCollection																												*
+	//*	ActionCollectionBase																										*
 	//*-------------------------------------------------------------------------*
 	/// <summary>
-	/// Collection of ActionItem Items.
+	/// Collection of ActionItemBase Items.
 	/// </summary>
-	public class ActionCollection : List<ActionItem>
+	public abstract class ActionCollectionBase<TAction, TCollection> :
+		List<TAction>
+		where TAction : ActionItemBase<TAction, TCollection>
+		where TCollection : ActionCollectionBase<TAction, TCollection>, new()
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -60,17 +63,29 @@ namespace ActionEngine
 		//*************************************************************************
 
 		//*-----------------------------------------------------------------------*
+		//* CreateNew																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Create and return a reference to a new collection of the defined type.
+		/// </summary>
+		/// <returns>
+		/// Reference to a new collection of the defined concrete type.
+		/// </returns>
+		public static TCollection CreateNew() { return new TCollection(); }
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	Parent																																*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
 		/// Private member for <see cref="Parent">Parent</see>.
 		/// </summary>
-		private ActionItem mParent = null;
+		private TAction mParent = null;
 		/// <summary>
 		/// Get/Set a reference to the batch file to which this sequence belongs.
 		/// </summary>
 		[JsonIgnore]
-		public ActionItem Parent
+		public TAction Parent
 		{
 			get { return mParent; }
 			set
@@ -78,9 +93,9 @@ namespace ActionEngine
 				//	NOTE: This is only stupid because Newtonsoft JSON ...
 				//	bypasses an overridden Add(Item) method.
 				mParent = value;
-				foreach(ActionItem actionItem in this)
+				foreach(TAction actionItem in this)
 				{
-					actionItem.Parent = this;
+					actionItem.Parent = (TCollection)this;
 				}
 			}
 		}
@@ -91,12 +106,14 @@ namespace ActionEngine
 	//*-------------------------------------------------------------------------*
 
 	//*-------------------------------------------------------------------------*
-	//*	ActionItem																															*
+	//*	ActionItemBase																													*
 	//*-------------------------------------------------------------------------*
 	/// <summary>
 	/// Information about an individual action that will be taken.
 	/// </summary>
-	public abstract class ActionItem
+	public abstract class ActionItemBase<TAction, TCollection>
+		where TAction : ActionItemBase<TAction, TCollection>
+		where TCollection : ActionCollectionBase<TAction, TCollection>, new()
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -143,7 +160,7 @@ namespace ActionEngine
 		/// Error messages are printed to the console when one or more of the
 		/// specified elements are not found.
 		/// </remarks>
-		protected static bool CheckElements(ActionItem item,
+		protected static bool CheckElements(TAction item,
 			ActionElementEnum element, bool includeInherited = true,
 			bool quiet = false)
 		{
@@ -561,11 +578,14 @@ namespace ActionEngine
 		/// Reference to the action item calling for the DataFiles collection to
 		/// be cleared.
 		/// </param>
-		protected static void ClearDataFiles(ActionItem item)
+		protected static void ClearDataFiles(TAction item)
 		{
-			if(item != null && item.mParent != null && item.mParent.Parent != null)
+			if(item != null)
 			{
-				item.mParent.Parent.mDataFiles.Clear();
+				if(item.Parent?.Parent != null)
+				{
+					item.Parent.Parent.mDataFiles.Clear();
+				}
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -580,11 +600,14 @@ namespace ActionEngine
 		/// Reference to the action item calling for the InputFiles collection to
 		/// be cleared.
 		/// </param>
-		protected static void ClearInputFiles(ActionItem item)
+		protected static void ClearInputFiles(TAction item)
 		{
-			if(item != null && item.mParent != null && item.mParent.Parent != null)
+			if(item != null)
 			{
-				item.mParent.Parent.mInputFiles.Clear();
+				if(item?.Parent.Parent != null)
+				{
+					item.Parent.Parent.mInputFiles.Clear();
+				}
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -601,7 +624,24 @@ namespace ActionEngine
 		/// <returns>
 		/// The deserialized top action from the file.
 		/// </returns>
-		protected abstract ActionItem DeserializeFile(string content);
+		protected virtual TAction DeserializeFile(string content)
+		{
+			TAction result = null;
+
+			if(content?.Length > 0)
+			{
+				try
+				{
+					result = JsonConvert.DeserializeObject<TAction>(content);
+				}
+				catch(Exception ex)
+				{
+					Trace.WriteLine($"Error deserializing: {ex.Message}",
+						MessageImportanceEnum.Err.ToString());
+				}
+			}
+			return result;
+		}
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
@@ -615,7 +655,7 @@ namespace ActionEngine
 		/// Reference to the action item describing the image to draw and the
 		/// location at which to draw it.
 		/// </param>
-		protected static void DrawImage(ActionItem item)
+		protected static void DrawImage(TAction item)
 		{
 			int height = 0;
 			SKBitmap bitmap = null;
@@ -668,7 +708,7 @@ namespace ActionEngine
 		/// <remarks>
 		/// This method works upon the currently open file.
 		/// </remarks>
-		protected static void FileOpenImage(ActionItem item)
+		protected static void FileOpenImage(TAction item)
 		{
 			SKBitmap bitmap = null;
 			SKBitmap bitmapA = null;
@@ -735,7 +775,7 @@ namespace ActionEngine
 		/// <param name="item">
 		/// Reference to the item from which the item will be opened.
 		/// </param>
-		protected static void FileOverlayImage(ActionItem item)
+		protected static void FileOverlayImage(TAction item)
 		{
 			SKRect area = SKRect.Empty;
 			bool bContinue = true;
@@ -866,7 +906,7 @@ namespace ActionEngine
 		/// <param name="item">
 		/// Reference to the item from which the item will be opened.
 		/// </param>
-		protected static void FileSaveImage(ActionItem item)
+		protected static void FileSaveImage(TAction item)
 		{
 			FileInfo file = null;
 
@@ -911,22 +951,33 @@ namespace ActionEngine
 		/// <param name="item">
 		/// Reference to the file action item representing the loop base.
 		/// </param>
-		protected static async void ForEachFile(ActionItem item)
+		protected static async void ForEachFile(TAction item)
 		{
 			if(item != null)
 			{
 				foreach(FileInfo fileItem in item.InputFiles)
 				{
 					item.CurrentFile = fileItem;
-					await RunActions(item.Actions);
-					//foreach(FileActionItem actionItem in item.Actions)
-					//{
-					//	await actionItem.Run();
-					//}
+					if(item.Actions.Count > 0)
+					{
+						await RunActions(item.Actions);
+					}
 				}
 			}
 		}
 		//*-----------------------------------------------------------------------*
+
+		////*-----------------------------------------------------------------------*
+		////* GetActions																														*
+		////*-----------------------------------------------------------------------*
+		///// <summary>
+		///// Return the list of implemented actions.
+		///// </summary>
+		///// <returns>
+		///// Reference to the list of implemented actions.
+		///// </returns>
+		//protected abstract List<ActionItemBase> GetActions();
+		////*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//* GetCurrentFile																												*
@@ -946,7 +997,7 @@ namespace ActionEngine
 		/// object will be returned from the CurrentFile property. Otherwise, the
 		/// first item in InputFiles collection is returned.
 		/// </remarks>
-		protected static FileInfo GetCurrentFile(ActionItem item)
+		protected static FileInfo GetCurrentFile(TAction item)
 		{
 			FileInfo result = null;
 
@@ -992,7 +1043,7 @@ namespace ActionEngine
 		/// <returns>
 		/// Decimal precision to use on the current item.
 		/// </returns>
-		protected static int GetPrecision(ActionItem item)
+		protected static int GetPrecision(TAction item)
 		{
 			int precision = 3;
 			NameValueItem property = null;
@@ -1043,7 +1094,7 @@ namespace ActionEngine
 		/// at the site with a reference to that custom property.
 		/// </para>
 		/// </remarks>
-		protected static void IdentifyDataFiles(ActionItem item)
+		protected static void IdentifyDataFiles(TAction item)
 		{
 			DirectoryInfo dir = null;
 			FileInfo file = null;
@@ -1142,7 +1193,7 @@ namespace ActionEngine
 		/// at the site with a reference to that custom property.
 		/// </para>
 		/// </remarks>
-		protected static void IdentifyInputFiles(ActionItem item)
+		protected static void IdentifyInputFiles(TAction item)
 		{
 			DirectoryInfo dir = null;
 			FileInfo file = null;
@@ -1235,7 +1286,7 @@ namespace ActionEngine
 		/// method relies on the file objects in this version.
 		/// </para>
 		/// </remarks>
-		protected static void IdentifyOutputFiles(ActionItem item)
+		protected static void IdentifyOutputFiles(TAction item)
 		{
 			DirectoryInfo dir = null;
 			FileInfo file = null;
@@ -1314,7 +1365,7 @@ namespace ActionEngine
 		/// Reference to the action item for which this action is being
 		/// called.
 		/// </param>
-		protected static async void If(ActionItem item)
+		protected static async void If(TAction item)
 		{
 			bool bMatch = false;
 			ConditionCollection conditions = null;
@@ -1332,7 +1383,7 @@ namespace ActionEngine
 				context.Variables["CurrentFileNumber"] =
 					GetIndexValue(item.CurrentFile.Name);
 
-				foreach(ActionItem actionItem in item.Actions)
+				foreach(TAction actionItem in item.Actions)
 				{
 					if(!actionItem.Options.Exists(x => x.Name.ToLower() == "mute"))
 					{
@@ -1351,11 +1402,10 @@ namespace ActionEngine
 						if(bMatch)
 						{
 							//	This item evaluates to true. Run its actions.
-							await RunActions(actionItem.Actions);
-							//foreach(FileActionItem trueActionItem in actionItem.Actions)
-							//{
-							//	await trueActionItem.Run();
-							//}
+							if(actionItem.Actions.Count > 0)
+							{
+								await RunActions(actionItem.Actions);
+							}
 						}
 					}
 					else
@@ -1378,7 +1428,7 @@ namespace ActionEngine
 		/// Reference to the file action item for which this action is being
 		/// called.
 		/// </param>
-		protected static void ImageBackground(ActionItem item)
+		protected static void ImageBackground(TAction item)
 		{
 			string backgroundColor = "";
 			SKBitmap backgroundBitmap = null;
@@ -1438,7 +1488,7 @@ namespace ActionEngine
 		/// <remarks>
 		/// This method also clears the WorkingImage property.
 		/// </remarks>
-		protected static void ImagesClear(ActionItem item)
+		protected static void ImagesClear(TAction item)
 		{
 			if(item != null)
 			{
@@ -1475,7 +1525,7 @@ namespace ActionEngine
 		///	In this version, the conversion is made on every action at every level.
 		///	</para>
 		/// </remarks>
-		protected static void InitializeFilenames(ActionItem item)
+		protected static void InitializeFilenames(TAction item)
 		{
 			if(item != null)
 			{
@@ -1563,15 +1613,15 @@ namespace ActionEngine
 		/// <param name="action">
 		/// Reference to an action derivative.
 		/// </param>
-		protected static void InitializeParent(ActionItem action)
+		protected static void InitializeParent(TAction action)
 		{
-			ActionCollection actions = null;
+			TCollection actions = null;
 
 			if(action != null)
 			{
-				actions = action.mActions;
+				actions = action.Actions;
 				actions.Parent = action;
-				foreach(ActionItem actionItem in actions)
+				foreach(TAction actionItem in action.Actions)
 				{
 					actionItem.Parent = actions;
 					InitializeParent(actionItem);
@@ -1596,7 +1646,7 @@ namespace ActionEngine
 			{
 				//	Only initialize once.
 				properties =
-					typeof(ActionItem).GetProperties(bindingFlags);
+					typeof(TAction).GetProperties(bindingFlags);
 				foreach(PropertyInfo propertyInfoItem in properties)
 				{
 					mPublicProperties.Add(propertyInfoItem);
@@ -1621,7 +1671,7 @@ namespace ActionEngine
 		/// <returns>
 		/// Fully normalized version of the provided filename.
 		/// </returns>
-		protected static string NormalizeValue(ActionItem item,
+		protected static string NormalizeValue(TAction item,
 			string value)
 		{
 			MatchCollection matches = null;
@@ -1669,7 +1719,7 @@ namespace ActionEngine
 		/// Reference to the action item containing information about the file to
 		/// open.
 		/// </param>
-		protected static void OpenWorkingDocument(ActionItem item)
+		protected static void OpenWorkingDocument(TAction item)
 		{
 			string content = "";
 			ActionDocumentItem doc = null;
@@ -1703,11 +1753,11 @@ namespace ActionEngine
 		/// <returns>
 		/// Reference to the asynchronous task that was launched.
 		/// </returns>
-		protected static async Task RunActions(List<ActionItem> actions)
+		protected static async Task RunActions(List<TAction> actions)
 		{
 			if(actions?.Count > 0)
 			{
-				foreach(ActionItem actionItem in actions)
+				foreach(TAction actionItem in actions)
 				{
 					if(!actionItem.Options.Exists(x => x.Name.ToLower() == "mute"))
 					{
@@ -1755,10 +1805,10 @@ namespace ActionEngine
 		/// This method loads the Actions collection from the steps found in
 		/// the referenced sequence.
 		/// </remarks>
-		protected static async void RunSequence(ActionItem item)
+		protected static async void RunSequence(TAction item)
 		{
 			string name = "";
-			SequenceItem sequence = null;
+			SequenceItem<TAction> sequence = null;
 
 			if(item != null)
 			{
@@ -1771,7 +1821,7 @@ namespace ActionEngine
 					if(sequence != null)
 					{
 						//	Copy all of the actions.
-						foreach(ActionItem actionItem in sequence.Actions)
+						foreach(TAction actionItem in sequence.Actions)
 						{
 							item.Actions.Add(DeepCopy(actionItem));
 						}
@@ -1793,7 +1843,7 @@ namespace ActionEngine
 		/// <param name="item">
 		/// Reference to the item where the file action is defined.
 		/// </param>
-		protected static void SaveWorkingDocument(ActionItem item)
+		protected static void SaveWorkingDocument(TAction item)
 		{
 			string content = "";
 
@@ -1830,7 +1880,7 @@ namespace ActionEngine
 		/// <param name="item">
 		/// Reference to the action item specifying the file to be activated.
 		/// </param>
-		protected static void SetWorkingImage(ActionItem item)
+		protected static void SetWorkingImage(TAction item)
 		{
 			BitmapInfoItem imageInfo = null;
 			string imageName = "";
@@ -1865,7 +1915,7 @@ namespace ActionEngine
 		/// Reference to the action item describing the new size to use on
 		/// the working image.
 		/// </param>
-		protected static void SizeImage(ActionItem item)
+		protected static void SizeImage(TAction item)
 		{
 			SKBitmap bitmap = null;
 			int height = 0;
@@ -1911,9 +1961,9 @@ namespace ActionEngine
 		//*	_Constructor																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
-		/// Create a new instance of the ActionItem Item.
+		/// Create a new instance of the ActionItemBase Item.
 		/// </summary>
-		public ActionItem()
+		public ActionItemBase()
 		{
 			InitializeProperties();
 		}
@@ -1945,15 +1995,14 @@ namespace ActionEngine
 		/// <summary>
 		/// Private member for <see cref="Actions">Actions</see>.
 		/// </summary>
-		private ActionCollection mActions =
-			new ActionCollection();
+		private TCollection mActions = new TCollection();
 		/// <summary>
 		/// Get a reference to the collection of child SVG actions.
 		/// </summary>
 		/// <remarks>
 		/// This property is non-inheritable.
 		/// </remarks>
-		public virtual ActionCollection Actions
+		public TCollection Actions
 		{
 			get { return mActions; }
 		}
@@ -1981,9 +2030,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.Base;
+						result = Parent.Parent.Base;
 					}
 					else
 					{
@@ -2056,9 +2105,9 @@ namespace ActionEngine
 
 				if(result == float.MinValue)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.Count;
+						result = Parent.Parent.Count;
 					}
 					else
 					{
@@ -2090,9 +2139,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.CurrentFile;
+						result = Parent.Parent.CurrentFile;
 					}
 				}
 				return result;
@@ -2141,9 +2190,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.DataFilename;
+						result = Parent.Parent.DataFilename;
 					}
 					else
 					{
@@ -2179,9 +2228,9 @@ namespace ActionEngine
 
 				if(result.Count == 0)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.DataFiles;
+						result = Parent.Parent.DataFiles;
 					}
 				}
 				return result;
@@ -2211,11 +2260,11 @@ namespace ActionEngine
 			{
 				List<string> result = mDataNames;
 
-				if(result.Count == 0 && mParent?.Parent != null)
+				if(result.Count == 0 && Parent?.Parent != null)
 				{
 					//	If the local list is not overridden, then default to the
 					//	parent.
-					result = mParent.Parent.DataNames;
+					result = Parent.Parent.DataNames;
 				}
 				return result;
 			}
@@ -2242,9 +2291,9 @@ namespace ActionEngine
 			{
 				DateTime result = mDateTimeValue;
 
-				if(result == DateTime.MinValue && mParent?.Parent != null)
+				if(result == DateTime.MinValue && Parent?.Parent != null)
 				{
-					result = mParent.Parent.DateTimeValue;
+					result = Parent.Parent.DateTimeValue;
 				}
 				return result;
 			}
@@ -2273,9 +2322,9 @@ namespace ActionEngine
 
 				if(result == int.MinValue)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.Digits;
+						result = Parent.Parent.Digits;
 					}
 					else
 					{
@@ -2302,8 +2351,7 @@ namespace ActionEngine
 		/// Reference to a collection of all conditions defined at the current and
 		/// baser levels.
 		/// </returns>
-		public static ConditionCollection GetConditions(
-			ActionItem item)
+		public static ConditionCollection GetConditions(TAction item)
 		{
 			ConditionCollection conditions = null;
 			ConditionCollection result = new ConditionCollection();
@@ -2343,8 +2391,7 @@ namespace ActionEngine
 		/// <returns>
 		/// Reference to the specified option, if found. Otherwise, null.
 		/// </returns>
-		public static ActionOptionItem GetOptionByName(
-			ActionItem item,
+		public static ActionOptionItem GetOptionByName(TAction item,
 			string optionName)
 		{
 			ActionOptionItem result = null;
@@ -2353,14 +2400,27 @@ namespace ActionEngine
 			{
 				result = item.Options.FirstOrDefault(x =>
 					x.Name.ToLower() == optionName.ToLower());
-				if(result == null && item.mParent.Parent != null)
+				if(result == null && item.Parent.Parent != null)
 				{
-					result = GetOptionByName(item.mParent.Parent, optionName);
+					result = GetOptionByName(item.Parent.Parent, optionName);
 				}
 			}
 			return result;
 		}
 		//*-----------------------------------------------------------------------*
+
+		////*-----------------------------------------------------------------------*
+		////* GetParentAction																												*
+		////*-----------------------------------------------------------------------*
+		///// <summary>
+		///// Return a reference to the parent of this action.
+		///// </summary>
+		///// <returns>
+		///// Reference to the parent action of this action, if defined. Otherwise,
+		///// null.
+		///// </returns>
+		//public abstract ActionItemBase GetParentAction();
+		////*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//* GetPropertyByName																											*
@@ -2381,7 +2441,7 @@ namespace ActionEngine
 		/// <returns>
 		/// Reference to the specified property, if found. Otherwise, null.
 		/// </returns>
-		public static string GetPropertyByName(ActionItem item,
+		public static string GetPropertyByName(TAction item,
 			string propertyName, bool resolveVariables = true)
 		{
 			PropertyInfo propertySystem = null;
@@ -2412,9 +2472,9 @@ namespace ActionEngine
 					{
 						result = propertyUser.Value;
 					}
-					else if(item.mParent != null && item.mParent.Parent != null)
+					else if(item.Parent != null && item.Parent.Parent != null)
 					{
-						result = GetPropertyByName(item.mParent.Parent,
+						result = GetPropertyByName(item.Parent.Parent,
 							propertyName, false);
 					}
 				}
@@ -2442,8 +2502,7 @@ namespace ActionEngine
 		/// Reference to the PowerPoint document found, if successul. Otherwise,
 		/// null.
 		/// </returns>
-		private static ActionDocumentItem GetSpecifiedOrWorking(
-			ActionItem item)
+		private static ActionDocumentItem GetSpecifiedOrWorking(TAction item)
 		{
 			string content = "";
 			ActionDocumentItem doc = null;
@@ -2526,9 +2585,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.InputFilename;
+						result = Parent.Parent.InputFilename;
 					}
 					else
 					{
@@ -2562,9 +2621,9 @@ namespace ActionEngine
 			{
 				List<FileInfo> result = mInputFiles;
 
-				if(result.Count == 0 && mParent?.Parent != null)
+				if(result.Count == 0 && Parent?.Parent != null)
 				{
-					result = mParent.Parent.InputFiles;
+					result = Parent.Parent.InputFiles;
 				}
 				return result;
 			}
@@ -2593,9 +2652,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.InputFolderName;
+						result = Parent.Parent.InputFolderName;
 					}
 					else
 					{
@@ -2630,11 +2689,11 @@ namespace ActionEngine
 			{
 				List<string> result = mInputNames;
 
-				if(result.Count == 0 && mParent?.Parent != null)
+				if(result.Count == 0 && Parent?.Parent != null)
 				{
 					//	If the local list is not overridden, then default to the
 					//	parent.
-					result = mParent.Parent.InputNames;
+					result = Parent.Parent.InputNames;
 				}
 				return result;
 			}
@@ -2730,9 +2789,9 @@ namespace ActionEngine
 			{
 				DirectoryInfo directory = mOutputDir;
 
-				if(directory == null && mParent != null && mParent != null)
+				if(directory == null && Parent != null && Parent != null)
 				{
-					directory = mParent.Parent.OutputDir;
+					directory = Parent.Parent.OutputDir;
 				}
 				return directory;
 			}
@@ -2762,7 +2821,7 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent != null)
+					if(Parent != null)
 					{
 						result = mOutputFilename;
 					}
@@ -2799,9 +2858,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.OutputFolderName;
+						result = Parent.Parent.OutputFolderName;
 					}
 					else
 					{
@@ -2839,9 +2898,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.OutputName;
+						result = Parent.Parent.OutputName;
 					}
 					else
 					{
@@ -2897,7 +2956,7 @@ namespace ActionEngine
 		/// <summary>
 		/// Private member for <see cref="Parent">Parent</see>.
 		/// </summary>
-		private ActionCollection mParent = null;
+		private TCollection mParent = null;
 		/// <summary>
 		/// Get/Set a reference to the parent of this item.
 		/// </summary>
@@ -2905,7 +2964,7 @@ namespace ActionEngine
 		/// This property is non-inheritable.
 		/// </remarks>
 		[JsonIgnore]
-		public virtual ActionCollection Parent
+		public TCollection Parent
 		{
 			get { return mParent; }
 			set { mParent = value; }
@@ -2931,9 +2990,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.Pattern;
+						result = Parent.Parent.Pattern;
 					}
 					else
 					{
@@ -2988,9 +3047,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.Range;
+						result = Parent.Parent.Range;
 					}
 					else
 					{
@@ -3041,10 +3100,10 @@ namespace ActionEngine
 			string lineNumber = "";
 			Match match = null;
 			string position = "";
-			List<ActionItem> soloItems = null;
+			List<TAction> soloItems = null;
 			string sourceFilename = "";
 			string targetFilename = "";
-			ActionItem topItem = null;
+			TAction topItem = null;
 
 			//	TODO: Create an error exit routine...
 			//	Decide which errors require exit and which can just be reported.
@@ -3072,15 +3131,15 @@ namespace ActionEngine
 						$"Opening configuration file: {Path.GetFileName(ConfigFilename)}",
 						$"{MessageImportanceEnum.Info}");
 					sourceFilename = AbsolutePath(
-						GetPropertyByName(this, nameof(WorkingPath)),
-						GetPropertyByName(this, nameof(ConfigFilename)));
+						GetPropertyByName((TAction)this, nameof(WorkingPath)),
+						GetPropertyByName((TAction)this, nameof(ConfigFilename)));
 					content = File.ReadAllText(sourceFilename);
 					if(content?.Length > 0)
 					{
 						try
 						{
 							topItem = DeserializeFile(content);
-							//topItem = JsonConvert.DeserializeObject<ActionItem>(content);
+							//topItem = JsonConvert.DeserializeObject<ActionItemBase>(content);
 							if(ComparesEqual(topItem.Action, "batch"))
 							{
 								//	All of the top item information is added to this item.
@@ -3098,8 +3157,8 @@ namespace ActionEngine
 								//	The top item is a child of this action.
 								this.Actions.Add(topItem);
 							}
-							this.Actions.Parent = this;
-							InitializeParent(this);
+							this.Actions.Parent = (TAction)this;
+							InitializeParent((TAction)this);
 						}
 						catch(Exception ex)
 						{
@@ -3130,22 +3189,22 @@ namespace ActionEngine
 						$"{MessageImportanceEnum.Err}");
 				}
 			}
-			this.Actions.Parent = this;
+			this.Actions.Parent = (TAction)this;
 			//if(mParent == null)
 			//{
 			//	//	Initialize all levels from the top level.
 			//	InitializeLevels(this);
 			//}
-			InitializeFilenames(this);
+			InitializeFilenames((TAction)this);
 			//if(mAction != ActionTypeEnum.Batch)
 			//{
 			//	//	When this level isn't a batch, identify all folders and files
 			//	//	for the action.
 			//	In this version, input files can be defined at any level.
-			IdentifyInputFiles(this);
-			IdentifyDataFiles(this);
+			IdentifyInputFiles((TAction)this);
+			IdentifyDataFiles((TAction)this);
 			//}
-			IdentifyOutputFiles(this);
+			IdentifyOutputFiles((TAction)this);
 			action = mAction.ToLower();
 			switch(action)
 			{
@@ -3185,49 +3244,49 @@ namespace ActionEngine
 					}
 					break;
 				case "drawimage":
-					DrawImage(this);
+					DrawImage((TAction)this);
 					break;
 				case "fileopenimage":
-					FileOpenImage(this);
+					FileOpenImage((TAction)this);
 					break;
 				case "fileoverlayimage":
-					FileOverlayImage(this);
+					FileOverlayImage((TAction)this);
 					break;
 				case "filesaveimage":
-					FileSaveImage(this);
+					FileSaveImage((TAction)this);
 					break;
 				case "foreachfile":
-					ForEachFile(this);
+					ForEachFile((TAction)this);
 					break;
 				case "if":
 					//	Run comparisons in this item's Actions collection.
-					If(this);
+					If((TAction)this);
 					break;
 				case "imagebackground":
 					//	Paint the specified image background color and / or image
 					//	on the current working image.
-					ImageBackground(this);
+					ImageBackground((TAction)this);
 					break;
 				case "imagesclear":
 					//	Clear the current working image set.
-					ImagesClear(this);
+					ImagesClear((TAction)this);
 					break;
 				case "openworkingdocument":
 					//	Open the working file to allow multiple operations to be
 					//	completed in the same session.
-					OpenWorkingDocument(this);
+					OpenWorkingDocument((TAction)this);
 					break;
 				case "runsequence":
-					RunSequence(this);
+					RunSequence((TAction)this);
 					break;
 				case "saveworkingdocument":
-					SaveWorkingDocument(this);
+					SaveWorkingDocument((TAction)this);
 					break;
 				case "setworkingimage":
-					SetWorkingImage(this);
+					SetWorkingImage((TAction)this);
 					break;
 				case "sizeimage":
-					SizeImage(this);
+					SizeImage((TAction)this);
 					break;
 				default:
 					RunCustomAction();
@@ -3241,22 +3300,23 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 		//*	Sequences																															*
 		//*-----------------------------------------------------------------------*
-		private SequenceCollection mSequences = new SequenceCollection();
+		private SequenceCollection<TAction> mSequences =
+			new SequenceCollection<TAction>();
 		/// <summary>
 		/// Get a reference to the collection of sequences defined for this action.
 		/// </summary>
 		/// <remarks>
 		/// This property is not inheritable.
 		/// </remarks>
-		public SequenceCollection Sequences
+		public SequenceCollection<TAction> Sequences
 		{
 			get
 			{
-				SequenceCollection result = mSequences;
+				SequenceCollection<TAction> result = mSequences;
 
-				if(result.Count == 0 && mParent != null && mParent.Parent != null)
+				if(result.Count == 0 && Parent != null && Parent.Parent != null)
 				{
-					result = mParent.Parent.Sequences;
+					result = Parent.Parent.Sequences;
 				}
 				return result;
 			}
@@ -3306,9 +3366,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.SourceFolderName;
+						result = Parent.Parent.SourceFolderName;
 					}
 					else
 					{
@@ -3335,9 +3395,9 @@ namespace ActionEngine
 			set
 			{
 				mStop = value;
-				if(mParent?.Parent != null)
+				if(Parent?.Parent != null)
 				{
-					mParent.Parent.Stop = value;
+					Parent.Parent.Stop = value;
 				}
 			}
 		}
@@ -3393,9 +3453,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.Text;
+						result = Parent.Parent.Text;
 					}
 					else
 					{
@@ -3426,9 +3486,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.WorkingDocument;
+						result = Parent.Parent.WorkingDocument;
 					}
 				}
 				return result;
@@ -3436,7 +3496,7 @@ namespace ActionEngine
 			set
 			{
 				if(mInputFilename?.Length > 0 ||
-					mParent == null || mParent.Parent == null)
+					Parent == null || Parent.Parent == null)
 				{
 					mWorkingDocument = value;
 					if(mWorkingDocument != null)
@@ -3445,9 +3505,9 @@ namespace ActionEngine
 					}
 				}
 				else if(string.IsNullOrEmpty(mInputFilename) &&
-					mParent?.Parent != null)
+					Parent?.Parent != null)
 				{
-					mParent.Parent.WorkingDocument = value;
+					Parent.Parent.WorkingDocument = value;
 				}
 			}
 		}
@@ -3487,9 +3547,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(mParent?.Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mParent.Parent.WorkingPath;
+						result = Parent.Parent.WorkingPath;
 					}
 					else
 					{

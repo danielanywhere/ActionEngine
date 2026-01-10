@@ -947,8 +947,11 @@ namespace ActionEngine
 		/// String representation of the specified property value, if found.
 		/// Otherwise, an empty string.
 		/// </returns>
-		public static string GetValue(ActionItem actionItem,
+		public static string GetValue<TAction, TCollection>(
+			TAction actionItem,
 			string propertyName)
+			where TAction : ActionItemBase<TAction, TCollection>
+			where TCollection : ActionCollectionBase<TAction, TCollection>, new()
 		{
 			PropertyInfo property = null;
 			string result = "";
