@@ -75,7 +75,7 @@ You are also able to perform the various general activities with built-in featur
 
 Configuration data can be loaded from and saved to a JSON-formatted text file. The following schema represents the generic base of the library itself. Any public properties you add to your own implementation class will automatically be added to this schema.
 
-```json
+```plaintext
 ActionItem
 {
 	Action: string,
