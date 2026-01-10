@@ -1715,29 +1715,8 @@ namespace ActionEngine
 		/// Open the working file to allow multiple operations to be completed
 		/// in the same session.
 		/// </summary>
-		/// <param name="item">
-		/// Reference to the action item containing information about the file to
-		/// open.
-		/// </param>
-		protected static void OpenWorkingDocument(TAction item)
+		protected virtual void OpenWorkingDocument()
 		{
-			string content = "";
-			ActionDocumentItem doc = null;
-
-			//	TODO: Open the PowerPoint.
-			if(item != null)
-			{
-				if(CheckElements(item,
-					ActionElementEnum.InputFilename))
-				{
-					//	Load the document if the filename was specified.
-					//content = File.ReadAllText(item.InputFiles[0].FullName);
-					//doc = new ActionDocumentItem(content);
-					//item.WorkingSvg = doc;
-					Trace.WriteLine($" Working document: {item.InputFiles[0].Name}",
-						$"{MessageImportanceEnum.Info}");
-				}
-			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2525,7 +2504,7 @@ namespace ActionEngine
 			string content = "";
 			ActionDocumentItem doc = null;
 
-			//	TODO: Get PowerPoint document.
+			//	TODO: Specified or working method needs work.
 			if(item != null)
 			{
 				if(CheckElements(item,
@@ -2931,43 +2910,6 @@ namespace ActionEngine
 		}
 		//*-----------------------------------------------------------------------*
 
-		////*-----------------------------------------------------------------------*
-		////*	OutputType																														*
-		////*-----------------------------------------------------------------------*
-		///// <summary>
-		///// Private member for <see cref="OutputType">OutputType</see>.
-		///// </summary>
-		//private RenderFileTypeEnum mOutputType = RenderFileTypeEnum.None;
-		///// <summary>
-		///// Get/Set the type of rendering to be done on the file affected by this
-		///// action.
-		///// </summary>
-		///// <remarks>
-		///// This property is inheritable.
-		///// </remarks>
-		//public RenderFileTypeEnum OutputType
-		//{
-		//	get
-		//	{
-		//		RenderFileTypeEnum result = mOutputType;
-
-		//		if(result == RenderFileTypeEnum.None)
-		//		{
-		//			if(mParent != null)
-		//			{
-		//				result = mParent.GetOutputType();
-		//			}
-		//			else
-		//			{
-		//				result = RenderFileTypeEnum.Auto;
-		//			}
-		//		}
-		//		return mOutputType;
-		//	}
-		//	set { mOutputType = value; }
-		//}
-		////*-----------------------------------------------------------------------*
-
 		//*-----------------------------------------------------------------------*
 		//*	Parent																																*
 		//*-----------------------------------------------------------------------*
@@ -3307,7 +3249,7 @@ namespace ActionEngine
 				case "openworkingdocument":
 					//	Open the working file to allow multiple operations to be
 					//	completed in the same session.
-					OpenWorkingDocument((TAction)this);
+					OpenWorkingDocument();
 					break;
 				case "runsequence":
 					RunSequence((TAction)this);
@@ -3353,6 +3295,422 @@ namespace ActionEngine
 				}
 				return result;
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeAction																									*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Action property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeAction()
+		{
+			return true;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeActions																								*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Actions property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeActions()
+		{
+			return mActions.Count > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeBase																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Base property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeBase()
+		{
+			return mBase?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeConditions																							*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Conditions property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeConditions()
+		{
+			return mConditions.Count > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeConfigFilename																					*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the ConfigFilename property should
+		/// be serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeConfigFilename()
+		{
+			return mConfigFilename?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeCount																									*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Count property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeCount()
+		{
+			return mCount != float.MinValue;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeDataFilename																						*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the DataFilename property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeDataFilename()
+		{
+			return mDataFilename?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeDataNames																							*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the DataNames property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeDataNames()
+		{
+			return mDataNames.Count > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeDateTimeValue																					*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the DateTimeValue property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeDateTimeValue()
+		{
+			return DateTime.Compare(mDateTimeValue, DateTime.MinValue) != 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeDigits																									*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Digits property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeDigits()
+		{
+			return mDigits != int.MinValue;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeInputFilename																					*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the InputFilename property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeInputFilename()
+		{
+			return mInputFilename?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeInputFolderName																				*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the InputFolderName property should
+		/// be serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeInputFolderName()
+		{
+			return mInputFolderName?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeInputNames																							*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the InputNames property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeInputNames()
+		{
+			return mInputNames.Count > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeMessage																								*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Message property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeMessage()
+		{
+			return mMessage?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeOptions																								*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Options property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeOptions()
+		{
+			return mOptions.Count > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeOutputFilename																					*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the OutputFilename property should
+		/// be serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeOutputFilename()
+		{
+			return mOutputFilename?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeOutputFolderName																				*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the OutputFolderName property should
+		/// be serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeOutputFolderName()
+		{
+			return mOutputFolderName?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeOutputName																							*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the OutputName property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeOutputName()
+		{
+			return mOutputName?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializePattern																								*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Pattern property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializePattern()
+		{
+			return mPattern?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeProperties																							*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Properties property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeProperties()
+		{
+			return mProperties.Count > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeRange																									*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Range property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeRange()
+		{
+			return mRange != null;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeSequences																							*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Sequences property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeSequences()
+		{
+			return mSequences.Count > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeSourceFolderName																				*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the SourceFolderName property should
+		/// be serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeSourceFolderName()
+		{
+			return mSourceFolderName?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeText																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the Text property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeText()
+		{
+			return mText?.Length > 0;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeWorkingDocumentIndex																		*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the WorkingDocumentIndex property
+		/// should be serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeWorkingDocumentIndex()
+		{
+			return mWorkingDocumentIndex > -1;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	ShouldSerializeWorkingPath																						*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the WorkingPath property should be
+		/// serialized.
+		/// </summary>
+		/// <returns>
+		/// A value indicating whether or not to serialize the property.
+		/// </returns>
+		public virtual bool ShouldSerializeWorkingPath()
+		{
+			return mWorkingPath?.Length > 0;
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -3511,6 +3869,7 @@ namespace ActionEngine
 		/// <remarks>
 		/// <para>This property is inheritable.</para>
 		/// </remarks>
+		[JsonIgnore]
 		public ActionDocumentItem WorkingDocument
 		{
 			get
@@ -3543,6 +3902,43 @@ namespace ActionEngine
 					Parent.Parent.WorkingDocument = value;
 				}
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	WorkingDocumentIndex																									*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for
+		/// <see cref="WorkingDocumentIndex">WorkingDocumentIndex</see>.
+		/// </summary>
+		private int mWorkingDocumentIndex = -1;
+		/// <summary>
+		/// Get/Set the input file index representing the working document.
+		/// </summary>
+		/// <remarks>
+		/// This property is inheritable.
+		/// </remarks>
+		public int WorkingDocumentIndex
+		{
+			get
+			{
+				int result = mWorkingDocumentIndex;
+
+				if(result == -1)
+				{
+					if(Parent?.Parent != null)
+					{
+						result = Parent.Parent.WorkingDocumentIndex;
+					}
+				}
+				if(result == -1)
+				{
+					result = 0;
+				}
+				return result;
+			}
+			set { mWorkingDocumentIndex = value; }
 		}
 		//*-----------------------------------------------------------------------*
 
