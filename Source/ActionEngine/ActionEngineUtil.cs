@@ -1125,6 +1125,11 @@ namespace ActionEngine
 						{
 							files.Add(file);
 						}
+						else
+						{
+							Trace.WriteLine($"File not found: {file.FullName}",
+								$"{MessageImportanceEnum.Warn}");
+						}
 					}
 					else
 					{
