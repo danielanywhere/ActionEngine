@@ -1367,7 +1367,6 @@ namespace ActionEngine
 		/// </param>
 		protected static async void If(TAction item)
 		{
-			bool bMatch = false;
 			bool conditionResult = false;
 			ExpressionContext context;
 			IDynamicExpression dynCondition = null;
@@ -1380,9 +1379,12 @@ namespace ActionEngine
 				context.Imports.AddType(typeof(Math));
 				SetBuiltInExpressionValues<TAction>(context, item);
 				item.InitializeExpressionValues(context);
-				context.Variables["CurrentFilename"] = item.CurrentFile.Name;
-				context.Variables["CurrentFileNumber"] =
-					GetIndexValue(item.CurrentFile.Name);
+				if(item.CurrentFile != null)
+				{
+					context.Variables["CurrentFilename"] = item.CurrentFile.Name;
+					context.Variables["CurrentFileNumber"] =
+						GetIndexValue(item.CurrentFile.Name);
+				}
 				if(item.WorkingDocument != null)
 				{
 					context.Variables["WorkingFilename"] = item.WorkingDocument.Name;
@@ -1391,8 +1393,18 @@ namespace ActionEngine
 				{
 					context.Variables["WorkingFilename"] = "";
 				}
-				dynCondition = context.CompileDynamic(item.Condition);
-				conditionResult = (bool)dynCondition.Evaluate();
+				try
+				{
+					dynCondition =
+						context.CompileDynamic(item.Condition.Replace('\'', '"'));
+					conditionResult = (bool)dynCondition.Evaluate();
+				}
+				catch(Exception ex)
+				{
+					Trace.WriteLine(
+						$"Error evaluating expression: {item.Condition}\r\n" +
+						$"   {ex.Message}");
+				}
 				if(conditionResult)
 				{
 					await RunActions(item.Actions);

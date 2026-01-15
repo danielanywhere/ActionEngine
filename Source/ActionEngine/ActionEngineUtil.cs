@@ -1281,8 +1281,32 @@ namespace ActionEngine
 					workingValue = propertyInfo.GetValue(action);
 					if(workingValue != null)
 					{
-						context.Variables[propertyInfo.Name] = workingValue;
+						if(workingValue is string ||
+							workingValue is Int16 ||
+							workingValue is Int32 ||
+							workingValue is Int64 ||
+							workingValue is float ||
+							workingValue is double ||
+							workingValue is DateTime)
+						{
+							//	Remember NOOP? Those were the days! :-D
+							//	In this scenario, it's much faster to skip a single step than
+							//	to prove every negative case.
+						}
+						else if(workingValue is Guid guid)
+						{
+							workingValue = guid.ToString("D");
+						}
+						else
+						{
+							workingValue = workingValue.ToString();
+						}
 					}
+					else
+					{
+						workingValue = "null";
+					}
+					context.Variables[propertyInfo.Name] = workingValue;
 				}
 			}
 		}
