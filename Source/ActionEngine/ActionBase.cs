@@ -1367,12 +1367,17 @@ namespace ActionEngine
 		/// </param>
 		protected static async void If(TAction item)
 		{
+			string condition = "";
 			bool conditionResult = false;
-			ExpressionContext context;
+			ExpressionContext context = null;
 			IDynamicExpression dynCondition = null;
 
 			if(item != null)
 			{
+				condition = item.Condition;
+				Trace.WriteLine(
+					$" Condition: {(condition?.Length > 0 ? condition : "(empty)")}",
+					$"{MessageImportanceEnum.Info}");
 				context = new ExpressionContext();
 				// Allow the expression to use all static public methods of
 				// System.Math.

@@ -1287,6 +1287,7 @@ namespace ActionEngine
 							workingValue is Int64 ||
 							workingValue is float ||
 							workingValue is double ||
+							workingValue is decimal ||
 							workingValue is DateTime)
 						{
 							//	Remember NOOP? Those were the days! :-D
