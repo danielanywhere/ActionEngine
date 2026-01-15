@@ -1382,7 +1382,9 @@ namespace ActionEngine
 				// Allow the expression to use all static public methods of
 				// System.Math.
 				context.Imports.AddType(typeof(Math));
-				SetBuiltInExpressionValues<TAction>(context, item);
+				SetBuiltInExpressionValues(context, item);
+				condition = ResolveExpressionVariables<TAction, TCollection>(
+					item.Condition, item);
 				item.InitializeExpressionValues(context);
 				if(item.CurrentFile != null)
 				{
@@ -1401,7 +1403,7 @@ namespace ActionEngine
 				try
 				{
 					dynCondition =
-						context.CompileDynamic(item.Condition.Replace('\'', '"'));
+						context.CompileDynamic(condition.Replace('\'', '"'));
 					conditionResult = (bool)dynCondition.Evaluate();
 				}
 				catch(Exception ex)
@@ -1494,6 +1496,37 @@ namespace ActionEngine
 			{
 				Images.Clear();
 				WorkingImage = null;
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* InitializeDefaultVariables																						*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Initialize the Variables property, in the specified item and all of
+		/// its descendants, from the values in the corresponding DefaultVariables
+		/// collections.
+		/// </summary>
+		/// <param name="action">
+		/// Reference to an action derivative.
+		/// </param>
+		protected static void InitializeDefaultVariables(TAction action)
+		{
+			if(action != null)
+			{
+				foreach(NameValueItem nameValueItem in action.mDefaultVariables)
+				{
+					action.mVariables.Add(new VariableItem()
+					{
+						Name = nameValueItem.Name,
+						Value = nameValueItem.Value
+					});
+				}
+				foreach(TAction actionItem in action.Actions)
+				{
+					InitializeDefaultVariables(actionItem);
+				}
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -2312,6 +2345,27 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//*	DefaultVariables																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="DefaultVariables">DefaultVariables</see>.
+		/// </summary>
+		private NameValueCollection mDefaultVariables = new NameValueCollection();
+		/// <summary>
+		/// Get a reference to the collection of default variables assigned to this
+		/// action.
+		/// </summary>
+		/// <remarks>
+		/// This property is not inheritable. However, variables from parent
+		/// levels are retrieved when calling the GetVariable function.
+		/// </remarks>
+		public NameValueCollection DefaultVariables
+		{
+			get { return mDefaultVariables; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	Digits																																*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -2528,9 +2582,12 @@ namespace ActionEngine
 		/// <param name="name">
 		/// Name of the variable to read.
 		/// </param>
-		public static string GetVariable(TAction item, string name)
+		/// <returns>
+		/// Reference to the variable value read.
+		/// </returns>
+		public static object GetVariable(TAction item, string name)
 		{
-			string result = "";
+			object result = null;
 			VariableItem variable = null;
 			VariableCollection variables = null;
 
@@ -3168,6 +3225,7 @@ namespace ActionEngine
 							}
 							this.Actions.Parent = (TAction)this;
 							InitializeParent((TAction)this);
+							InitializeDefaultVariables((TAction)this);
 						}
 						catch(Exception ex)
 						{
@@ -3350,7 +3408,7 @@ namespace ActionEngine
 		/// <param name="value">
 		/// Value to place on the variable.
 		/// </param>
-		public static void SetVariable(TAction item, string name, string value)
+		public static void SetVariable(TAction item, string name, object value)
 		{
 			if(item != null)
 			{
@@ -3992,20 +4050,39 @@ namespace ActionEngine
 			get
 			{
 				List<VariableItem> inheritedVariables = null;
+				VariableItem variable = null;
 				VariableCollection variables = new VariableCollection();
 
-				variables.AddRange(mVariables);
 				if(Parent?.Parent != null)
 				{
 					inheritedVariables = Parent.Parent.Variables;
 					foreach(VariableItem variableItem in inheritedVariables)
 					{
-						if(!variables.Exists(x =>
+						variable = variables.FirstOrDefault(x =>
 							StringComparer.OrdinalIgnoreCase.Equals(
-								x.Name, variableItem.Name)))
+								x.Name, variableItem.Name));
+						if(variable == null)
 						{
-							variables.Add(variableItem);
+							variables.Add(VariableItem.Copy(variableItem));
 						}
+						else
+						{
+							variable.Value = variableItem.Value;
+						}
+					}
+				}
+				foreach(VariableItem variableItem in mVariables)
+				{
+					variable = variables.FirstOrDefault(x =>
+						StringComparer.OrdinalIgnoreCase.Equals(
+							x.Name, variableItem.Name));
+					if(variable == null)
+					{
+						variables.Add(VariableItem.Copy(variableItem));
+					}
+					else
+					{
+						variable.Value = variableItem.Value;
 					}
 				}
 				return variables;

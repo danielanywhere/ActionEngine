@@ -1048,6 +1048,71 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* ResolveExpressionVariables																						*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Resolve the variable references in the caller's expression and return
+		/// the resolved value.
+		/// </summary>
+		/// <typeparam name="TAction">
+		/// The implemented action type for which the variables will be resolved.
+		/// </typeparam>
+		/// <param name="expression">
+		/// The expression that might contain variable references in interpolated
+		/// string syntax such as {VariableName}.
+		/// </param>
+		/// <param name="action">
+		/// Reference to the implemented ActionBase derivative.
+		/// </param>
+		/// <returns>
+		/// The expression, as it appears with all interpolated variable references
+		/// resolved.
+		/// </returns>
+		/// <remarks>
+		/// Technically, this method would be better suited for placement within
+		/// the ActionItemBase class, to avoid such a terse signature pattern.
+		/// However, it is important to be able to remember how to use this
+		/// kind of signature pattern externally. As a result, this method serves
+		/// as an example of how to generically service a generic CRTP class
+		/// externally.
+		/// </remarks>
+		public static string ResolveExpressionVariables<TAction, TCollection>(
+			string expression, TAction action)
+			where TAction : ActionItemBase<TAction, TCollection>
+			where TCollection : ActionCollectionBase<TAction, TCollection>, new()
+		{
+			MatchCollection matches = null;
+			string result = "";
+			object variable = null;
+			string variableName = "";
+			string variableReference = "";
+
+			if(action != null && expression?.Length > 0)
+			{
+				result = expression;
+				matches = Regex.Matches(expression, ResourceMain.rxVariableReference);
+				foreach(Match matchItem in matches)
+				{
+					variableName = GetValue(matchItem, "variableName");
+					variableReference = GetValue(matchItem, "variableReference");
+					variable =
+						ActionItemBase<TAction, TCollection>
+							.GetVariable(action, variableName);
+					if(variable != null)
+					{
+						result = result.Replace(variableReference, variable.ToString());
+					}
+					else
+					{
+						result = result.Replace(variableReference, "null");
+					}
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* ResolveFilename																												*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -1282,6 +1347,7 @@ namespace ActionEngine
 					if(workingValue != null)
 					{
 						if(workingValue is string ||
+							workingValue is bool ||
 							workingValue is Int16 ||
 							workingValue is Int32 ||
 							workingValue is Int64 ||

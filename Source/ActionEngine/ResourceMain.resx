@@ -133,4 +133,8 @@
     <value>^(?&lt;pre&gt;.*?)(?&lt;seed&gt;\d+)(?&lt;post&gt;.*)$</value>
     <comment>Regular expression to separate the numerical seed in the string and to return all of the parts of the string.</comment>
   </data>
+  <data name="rxVariableReference" xml:space="preserve">
+    <value>(?i:(?&lt;variableReference&gt;\{(?&lt;variableName&gt;[^\}]+)\}))</value>
+    <comment>Regular expression to find variable references and their names within a string.</comment>
+  </data>
 </root>

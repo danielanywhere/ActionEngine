@@ -40,6 +40,36 @@ namespace ActionEngine
 		//*************************************************************************
 		//*	Public																																*
 		//*************************************************************************
+		//*-----------------------------------------------------------------------*
+		//* GetValue																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the value of the specified object in the variables collection.
+		/// </summary>
+		/// <param name="name">
+		/// Name of the variable to read.
+		/// </param>
+		/// <returns>
+		/// Reference to the specified item value in the collection, if found.
+		/// Otherwise, null.
+		/// </returns>
+		public object GetValue(string name)
+		{
+			VariableItem item = null;
+			object result = null;
+
+			if(name?.Length > 0)
+			{
+				item = this.FirstOrDefault(x =>
+					StringComparer.OrdinalIgnoreCase.Equals(x.Name, name));
+				if(item != null)
+				{
+					result = item.Value;
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//*	SetValue																															*
@@ -54,7 +84,7 @@ namespace ActionEngine
 		/// <param name="value">
 		/// Value to set.
 		/// </param>
-		public void SetValue(string name, string value)
+		public void SetValue(string name, object value)
 		{
 			VariableItem item = null;
 
@@ -70,14 +100,15 @@ namespace ActionEngine
 					};
 					this.Add(item);
 				}
-				if(value?.Length > 0)
-				{
-					item.Value = value;
-				}
-				else
-				{
-					item.Value = "";
-				}
+				item.Value = value;
+				//if(value?.Length > 0)
+				//{
+				//	item.Value = value;
+				//}
+				//else
+				//{
+				//	item.Value = "";
+				//}
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -104,6 +135,32 @@ namespace ActionEngine
 		//*	Public																																*
 		//*************************************************************************
 		//*-----------------------------------------------------------------------*
+		//*	Copy																																	*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a shallow copy of the caller's source variable.
+		/// </summary>
+		/// <param name="source">
+		/// </param>
+		/// <returns>
+		/// </returns>
+		public static VariableItem Copy(VariableItem source)
+		{
+			VariableItem result = null;
+
+			if(source != null)
+			{
+				result = new VariableItem()
+				{
+					Name = source.Name,
+					Value = source.Value
+				};
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	Name																																	*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -126,11 +183,11 @@ namespace ActionEngine
 		/// <summary>
 		/// Private member for <see cref="Value">Value</see>.
 		/// </summary>
-		private string mValue = "";
+		private object mValue = null;
 		/// <summary>
 		/// Get/Set the value of the variable.
 		/// </summary>
-		public string Value
+		public object Value
 		{
 			get { return mValue; }
 			set { mValue = value; }

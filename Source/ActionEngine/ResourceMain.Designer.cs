@@ -95,5 +95,14 @@ namespace ActionEngine {
                 return ResourceManager.GetString("rxNumericalSeed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (?i:(?&lt;variableReference&gt;\{(?&lt;variableName&gt;[^\}]+)\})).
+        /// </summary>
+        internal static string rxVariableReference {
+            get {
+                return ResourceManager.GetString("rxVariableReference", resourceCulture);
+            }
+        }
     }
 }
