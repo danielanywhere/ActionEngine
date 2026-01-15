@@ -3139,7 +3139,17 @@ namespace ActionEngine
 					sourceFilename = AbsolutePath(
 						GetPropertyByName((TAction)this, nameof(WorkingPath)),
 						GetPropertyByName((TAction)this, nameof(ConfigFilename)));
-					content = File.ReadAllText(sourceFilename);
+					try
+					{
+						content = File.ReadAllText(sourceFilename);
+					}
+					catch(Exception ex)
+					{
+						Trace.WriteLine(
+							$"Error reading configuration file: {ConfigFilename}",
+							$"{MessageImportanceEnum.Err}");
+						content = "";
+					}
 					if(content?.Length > 0)
 					{
 						try
