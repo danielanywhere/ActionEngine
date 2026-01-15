@@ -1368,7 +1368,6 @@ namespace ActionEngine
 		protected static async void If(TAction item)
 		{
 			bool bMatch = false;
-			ConditionCollection conditions = null;
 			bool conditionResult = false;
 			ExpressionContext context;
 			IDynamicExpression dynCondition = null;
@@ -1376,43 +1375,27 @@ namespace ActionEngine
 			if(item != null)
 			{
 				context = new ExpressionContext();
-				//// Allow the expression to use all static public methods of
-				//// System.Math.
-				//context.Imports.AddType(typeof(Math));
+				// Allow the expression to use all static public methods of
+				// System.Math.
+				context.Imports.AddType(typeof(Math));
+				SetBuiltInExpressionValues<TAction>(context, item);
+				item.InitializeExpressionValues(context);
 				context.Variables["CurrentFilename"] = item.CurrentFile.Name;
 				context.Variables["CurrentFileNumber"] =
 					GetIndexValue(item.CurrentFile.Name);
-
-				foreach(TAction actionItem in item.Actions)
+				if(item.WorkingDocument != null)
 				{
-					if(!actionItem.Options.Exists(x => x.Name.ToLower() == "mute"))
-					{
-						conditions = GetConditions(actionItem);
-						bMatch = true;
-						foreach(ConditionItem conditionItem in conditions)
-						{
-							dynCondition = context.CompileDynamic(conditionItem.Condition);
-							conditionResult = (bool)dynCondition.Evaluate();
-							if(!conditionResult)
-							{
-								bMatch = false;
-								break;
-							}
-						}
-						if(bMatch)
-						{
-							//	This item evaluates to true. Run its actions.
-							if(actionItem.Actions.Count > 0)
-							{
-								await RunActions(actionItem.Actions);
-							}
-						}
-					}
-					else
-					{
-						Trace.WriteLine($"Action {actionItem.Action} is muted...",
-							$"{MessageImportanceEnum.Info}");
-					}
+					context.Variables["WorkingFilename"] = item.WorkingDocument.Name;
+				}
+				else
+				{
+					context.Variables["WorkingFilename"] = "";
+				}
+				dynCondition = context.CompileDynamic(item.Condition);
+				conditionResult = (bool)dynCondition.Evaluate();
+				if(conditionResult)
+				{
+					await RunActions(item.Actions);
 				}
 			}
 		}
@@ -1495,6 +1478,22 @@ namespace ActionEngine
 				Images.Clear();
 				WorkingImage = null;
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* InitializeExpressionValues																						*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Initialize specialized expression values from the implemented instance.
+		/// </summary>
+		/// <param name="context">
+		/// Reference to the expression context to which any additions or changes
+		/// will be made.
+		/// </param>
+		protected virtual void InitializeExpressionValues(
+			ExpressionContext context)
+		{
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -1826,7 +1825,7 @@ namespace ActionEngine
 		{
 			string content = "";
 
-			//	TODO: Save working PowerPoint.
+			//	TODO: Save working document.
 
 			//if(item != null)
 			//{
@@ -2025,23 +2024,38 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
-		//*	Conditions																														*
+		//*	Condition																															*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
-		/// Private member for <see cref="Conditions">Conditions</see>.
-		/// </summary>
-		private ConditionCollection mConditions = new ConditionCollection();
-		/// <summary>
-		/// Get a reference to the collection of conditions assigned to this
-		/// action.
+		/// Private member for <see cref="Condition">Condition</see>.
 		/// </summary>
 		/// <remarks>
-		/// This property is not inheritable. However, properties from parent
-		/// levels are retrieved when calling the GetConditions function.
+		/// This property is inheritable.
 		/// </remarks>
-		public ConditionCollection Conditions
+		private string mCondition = "";
+		/// <summary>
+		/// Get/Set the condition for flow control on this action.
+		/// </summary>
+		public string Condition
 		{
-			get { return mConditions; }
+			get
+			{
+				string result = mCondition;
+
+				if(result == null)
+				{
+					if(Parent?.Parent != null)
+					{
+						result = Parent.Parent.Condition;
+					}
+					else
+					{
+						result = "";
+					}
+				}
+				return result;
+			}
+			set { mCondition = value; }
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2341,45 +2355,6 @@ namespace ActionEngine
 						result = actionNameItem;
 						break;
 					}
-				}
-			}
-			return result;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
-		//* GetConditions																													*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return a collection of conditions defined at the caller's item level
-		/// and at all of its parents.
-		/// </summary>
-		/// <param name="item">
-		/// Reference to the file action item to inspect.
-		/// </param>
-		/// <returns>
-		/// Reference to a collection of all conditions defined at the current and
-		/// baser levels.
-		/// </returns>
-		public static ConditionCollection GetConditions(TAction item)
-		{
-			ConditionCollection conditions = null;
-			ConditionCollection result = new ConditionCollection();
-
-			if(item != null)
-			{
-				if(item.Parent != null && item.Parent.Parent != null)
-				{
-					conditions = GetConditions(item.Parent.Parent);
-					foreach(ConditionItem conditionItem in conditions)
-					{
-						result.Add(conditionItem);
-					}
-				}
-				//	Write the local items last.
-				foreach(ConditionItem conditionItem in item.Conditions)
-				{
-					result.Add(conditionItem);
 				}
 			}
 			return result;
@@ -3146,7 +3121,8 @@ namespace ActionEngine
 					catch(Exception ex)
 					{
 						Trace.WriteLine(
-							$"Error reading configuration file: {ConfigFilename}",
+							$"Error reading configuration file: {ConfigFilename} - " +
+							ex.Message,
 							$"{MessageImportanceEnum.Err}");
 						content = "";
 					}
@@ -3415,18 +3391,18 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
-		//*	ShouldSerializeConditions																							*
+		//*	ShouldSerializeCondition																							*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
-		/// Return a value indicating whether the Conditions property should be
+		/// Return a value indicating whether the Condition property should be
 		/// serialized.
 		/// </summary>
 		/// <returns>
 		/// A value indicating whether or not to serialize the property.
 		/// </returns>
-		public virtual bool ShouldSerializeConditions()
+		public virtual bool ShouldSerializeCondition()
 		{
-			return mConditions.Count > 0;
+			return mCondition?.Length > 0;
 		}
 		//*-----------------------------------------------------------------------*
 

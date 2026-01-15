@@ -25,6 +25,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Flee.PublicTypes;
 using Newtonsoft.Json;
 using SkiaSharp;
 
@@ -1241,6 +1242,46 @@ namespace ActionEngine
 						{
 							data.SaveTo(stream);
 						}
+					}
+				}
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* SetBuiltInExpressionValues																						*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Set the built-in values for the caller's expression context from the
+		/// given action.
+		/// </summary>
+		/// <typeparam name="TAction">
+		/// The concrete type name of the generic class to be analyzed.
+		/// </typeparam>
+		/// <param name="context">
+		/// Reference to the context to be initialized.
+		/// </param>
+		/// <param name="action">
+		/// Reference to the active action for which the values will be
+		/// initialized.
+		/// </param>
+		public static void SetBuiltInExpressionValues<TAction>(
+			ExpressionContext context, TAction action)
+		{
+			BindingFlags bindingFlagsP =
+				BindingFlags.Instance | BindingFlags.Public;
+			PropertyInfo[] properties = null;
+			object workingValue = null;
+
+			if(context != null && action != null)
+			{
+				properties = typeof(TAction).GetProperties(bindingFlagsP);
+				foreach(PropertyInfo propertyInfo in properties)
+				{
+					workingValue = propertyInfo.GetValue(action);
+					if(workingValue != null)
+					{
+						context.Variables[propertyInfo.Name] = workingValue;
 					}
 				}
 			}
