@@ -38,7 +38,6 @@ using SkiaSharp;
 
 using static ActionEngine.ActionEngineUtil;
 
-
 namespace ActionEngine
 {
 	//*-------------------------------------------------------------------------*
@@ -1410,10 +1409,12 @@ namespace ActionEngine
 				{
 					Trace.WriteLine(
 						$"Error evaluating expression: {item.Condition}\r\n" +
-						$"   {ex.Message}");
+						$"  {ex.Message}");
 				}
 				if(conditionResult)
 				{
+					Trace.WriteLine(" Condition met...",
+						$"{MessageImportanceEnum.Info}");
 					await RunActions(item.Actions);
 				}
 			}
@@ -3412,7 +3413,16 @@ namespace ActionEngine
 		{
 			if(item != null)
 			{
-				item.mVariables.SetValue(name, value);
+				if(item.Parent?.Parent != null)
+				{
+					//	Prefer to set the value one level above so it can be shared
+					//	among the peers.
+					item.Parent.Parent.mVariables.SetValue(name, value);
+				}
+				else
+				{
+					item.mVariables.SetValue(name, value);
+				}
 			}
 		}
 		//*-----------------------------------------------------------------------*
