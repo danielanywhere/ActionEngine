@@ -1514,15 +1514,22 @@ namespace ActionEngine
 		/// </param>
 		protected static void InitializeDefaultVariables(TAction action)
 		{
+			VariableItem variable = null;
+
 			if(action != null)
 			{
 				foreach(NameValueItem nameValueItem in action.mDefaultVariables)
 				{
-					action.mVariables.Add(new VariableItem()
+					variable = new VariableItem()
 					{
 						Name = nameValueItem.Name,
 						Value = nameValueItem.Value
-					});
+					};
+					action.InitializeVariable(variable);
+					if(variable.Name?.Length > 0)
+					{
+						action.mVariables.Add(variable);
+					}
 				}
 				foreach(TAction actionItem in action.Actions)
 				{
@@ -1702,6 +1709,24 @@ namespace ActionEngine
 					mPublicProperties.Add(propertyInfoItem);
 				}
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* InitializeVariable																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Initialize and return the supplied variable under preparation.
+		/// </summary>
+		/// <param name="variable">
+		/// Reference to the variable being prepared.
+		/// </param>
+		/// <remarks>
+		/// If the variable initialization is cancelled, its name will be set to
+		/// an empty string and its value will be set to null.
+		/// </remarks>
+		protected virtual void InitializeVariable(VariableItem variable)
+		{
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2802,27 +2827,6 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
-		//*	OutputFile																														*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Private member for <see cref="OutputFile">OutputFile</see>.
-		/// </summary>
-		private FileInfo mOutputFile = null;
-		/// <summary>
-		/// Get/Set the internal, calculated output file.
-		/// </summary>
-		/// <remarks>
-		/// This property is non-inheritable.
-		/// </remarks>
-		[JsonIgnore]
-		public FileInfo OutputFile
-		{
-			get { return mOutputFile; }
-			set { mOutputFile = value; }
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
 		//*	OutputDir																															*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -2842,13 +2846,43 @@ namespace ActionEngine
 			{
 				DirectoryInfo directory = mOutputDir;
 
-				if(directory == null && Parent != null && Parent != null)
+				if(directory == null && Parent?.Parent != null)
 				{
 					directory = Parent.Parent.OutputDir;
 				}
 				return directory;
 			}
 			set { mOutputDir = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	OutputFile																														*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="OutputFile">OutputFile</see>.
+		/// </summary>
+		private FileInfo mOutputFile = null;
+		/// <summary>
+		/// Get/Set the internal, calculated output file.
+		/// </summary>
+		/// <remarks>
+		/// This property is inheritable.
+		/// </remarks>
+		[JsonIgnore]
+		public FileInfo OutputFile
+		{
+			get
+			{
+				FileInfo file = mOutputFile;
+
+				if(file == null && Parent?.Parent != null)
+				{
+					file = Parent.Parent.OutputFile;
+				}
+				return file;
+			}
+			set { mOutputFile = value; }
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2874,9 +2908,9 @@ namespace ActionEngine
 
 				if(result == null)
 				{
-					if(Parent != null)
+					if(Parent?.Parent != null)
 					{
-						result = mOutputFilename;
+						result = Parent.Parent.OutputFilename;
 					}
 					else
 					{
