@@ -1869,33 +1869,8 @@ namespace ActionEngine
 		/// <summary>
 		/// Save the working file to the specified output file.
 		/// </summary>
-		/// <param name="item">
-		/// Reference to the item where the file action is defined.
-		/// </param>
-		protected static void SaveWorkingDocument(TAction item)
+		protected virtual void SaveWorkingDocument()
 		{
-			string content = "";
-
-			//	TODO: Save working document.
-
-			//if(item != null)
-			//{
-			//	if(CheckElements(item, ActionElementEnum.OutputFilename))
-			//	{
-			//		if(item.WorkingPowerPoint?.Document != null)
-			//		{
-			//			content = item.WorkingSvg.Document.Html;
-			//			File.WriteAllText(item.OutputFile.FullName, content);
-			//			Trace.WriteLine($" SVG file written: {item.OutputFile.Name}",
-			//				$"{MessageImportanceEnum.Info}");
-			//		}
-			//		else
-			//		{
-			//			Trace.WriteLine($" Error: No working SVG file is open...",
-			//				$"{MessageImportanceEnum.Err}");
-			//		}
-			//	}
-			//}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -3348,7 +3323,7 @@ namespace ActionEngine
 					RunSequence((TAction)this);
 					break;
 				case "saveworkingdocument":
-					SaveWorkingDocument((TAction)this);
+					SaveWorkingDocument();
 					break;
 				case "setworkingimage":
 					SetWorkingImage((TAction)this);
