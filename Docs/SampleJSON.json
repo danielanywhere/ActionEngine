@@ -1,4 +1,5 @@
 {
+	"Remark": "Example file saved as 'C:\\Scripts\\Processing.json'",
 	"WorkingPath": "C:\\Temp\\Audio",
 	"InputFilename": "*.mp3",
 	"Action": "ForEachFile",

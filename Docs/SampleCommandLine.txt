@@ -1,0 +1,1 @@
+audioprocessor.exe /action:batch /configfile:C:\Scripts\Processing.json

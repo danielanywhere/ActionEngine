@@ -6,7 +6,7 @@ This library is mostly used in command-line applications performing utilitarian 
 
 Among other things that will be documented soon, the following features are built-in to this library.
 
-<p>&nbsp;</p>
+---
 
 ## Built-In Actions
 
@@ -28,31 +28,31 @@ The following actions are built-in to the **Action** property of the Action item
 -   **SetWorkingImage**. Set the current working image to the one with the local name found in the user property ImageName.
 -   **SizeImage**. Scale the image to a new size, as specified in user properties Width and Height.
 
-<p>&nbsp;</p>
+---
 
 ## Multi-Level Action Handling
 
 At any step, an action of type: Batch can be used to define a series of other actions, which can either reside in the Actions property of that action or within a separate JSON-formatted configuration file.
 
-<p>&nbsp;</p>
+---
 
 ## Conditional Flow
 
 Using the **If** action type, you can set a condition under which the entries in that action's **Actions** collection will be run. Branching scenarios are also very easy to maintain using multiple levels of **If**.
 
-<p>&nbsp;</p>
+---
 
 ## Action Sequences
 
 An individual list of actions can be used multiple times by enclosing it within an action of type **Sequence**.
 
-<p>&nbsp;</p>
+---
 
 ## Multiple Actions Per File
 
 Using the **ForEachFile** action type, you can rerun the same set of actions upon each file in the input files collection.
 
-<p>&nbsp;</p>
+---
 
 ## Check for Supplied Values
 
@@ -80,7 +80,7 @@ Anywhere in the instance, you can make a call to **CheckElements** to see if any
 -   **OptionPrefix**. Whether the prefix option has been specified.
 -   **OptionSuffix**. Whether the suffix option has been specified.
 
-<p>&nbsp;</p>
+---
 
 ## Other Operations
 
@@ -91,7 +91,7 @@ You are also able to perform the various general activities with built-in featur
 -   Load, work with, and save a working document.
 -   Load, work with, and save images.
 
-<p>&nbsp;</p>
+---
 
 ## Basic Schema
 
@@ -160,7 +160,7 @@ StartEndItem
 
 ```
 
-<p>&nbsp;</p>
+---
 
 ### Example JSON File
 
@@ -193,7 +193,7 @@ Following is an example of a basic JSON file using the above schema.
 
 ```
 
-<p>&nbsp;</p>
+---
 
 ### Example Command-Line
 
@@ -204,7 +204,7 @@ audioprocessor.exe /action:batch /configfile:C:\Scripts\Processing.json
 
 ```
 
-<p>&nbsp;</p>
+---
 
 ## Implementing Your Class
 
@@ -212,7 +212,7 @@ The action item and collection base classes are generic and abstract, meaning th
 
 Following are typical examples of definitions for the item and collection classes.
 
-<p>&nbsp;</p>
+---
 
 ### Collection Implementation
 
@@ -233,7 +233,7 @@ public class MyActionCollection :
 
 ```
 
-<p>&nbsp;</p>
+---
 
 ### Item Implementation
 
@@ -346,7 +346,7 @@ public class MyActionItem : ActionItemBase<MyActionItem, MyActionCollection>
 
 ```
 
-<p>&nbsp;</p>
+---
 
 ## Example Host Application
 
@@ -556,3 +556,19 @@ namespace AudioProcessor
 }
 
 ```
+
+
+## Updates
+
+| Version | Description |
+|---------|-------------|
+| 26.2117.4453 | Initial publication to GitHub. |
+
+
+## More Information
+
+For more information, please see the GitHub project:
+[danielanywhere/ActionEngine](https://github.com/danielanywhere/ActionEngine)
+
+Full API documentation is available at this library's [GitHub User Page](https://danielanywhere.github.io/ActionEngine).
+

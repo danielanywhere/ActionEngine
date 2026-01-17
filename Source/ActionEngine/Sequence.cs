@@ -29,6 +29,10 @@ namespace ActionEngine
 	/// <summary>
 	/// Collection of SequenceItem Items.
 	/// </summary>
+	/// <typeparam name="TAction">
+	/// The implemented type of action to which this collection of sequences
+	/// belongs.
+	/// </typeparam>
 	public class SequenceCollection<TAction> : List<SequenceItem<TAction>>
 	{
 		//*************************************************************************
@@ -51,6 +55,9 @@ namespace ActionEngine
 	/// <summary>
 	/// Individual sequence.
 	/// </summary>
+	/// <typeparam name="TAction">
+	/// The implemented type of action to which this sequence belongs.
+	/// </typeparam>
 	public class SequenceItem<TAction>
 	{
 		//*************************************************************************

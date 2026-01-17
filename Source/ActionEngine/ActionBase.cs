@@ -46,6 +46,12 @@ namespace ActionEngine
 	/// <summary>
 	/// Collection of ActionItemBase Items.
 	/// </summary>
+	/// <typeparam name="TAction">
+	/// The implemented type of action.
+	/// </typeparam>
+	/// <typeparam name="TCollection">
+	/// The implemented type of collection.
+	/// </typeparam>
 	public abstract class ActionCollectionBase<TAction, TCollection> :
 		List<TAction>
 		where TAction : ActionItemBase<TAction, TCollection>
@@ -110,6 +116,12 @@ namespace ActionEngine
 	/// <summary>
 	/// Information about an individual action that will be taken.
 	/// </summary>
+	/// <typeparam name="TAction">
+	/// The implemented type of action.
+	/// </typeparam>
+	/// <typeparam name="TCollection">
+	/// The implemented type of collection.
+	/// </typeparam>
 	public abstract class ActionItemBase<TAction, TCollection>
 		where TAction : ActionItemBase<TAction, TCollection>
 		where TCollection : ActionCollectionBase<TAction, TCollection>, new()

@@ -141,8 +141,10 @@ namespace ActionEngine
 		/// Return a shallow copy of the caller's source variable.
 		/// </summary>
 		/// <param name="source">
+		/// Reference to the source variable to be copied.
 		/// </param>
 		/// <returns>
+		/// Reference to the newly copied variable.
 		/// </returns>
 		public static VariableItem Copy(VariableItem source)
 		{

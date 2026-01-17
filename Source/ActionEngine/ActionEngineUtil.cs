@@ -293,6 +293,9 @@ namespace ActionEngine
 		/// <summary>
 		/// Return a new instance of the provided item.
 		/// </summary>
+		/// <typeparam name="T">
+		/// The concrete type of object to copy.
+		/// </typeparam>
 		/// <param name="item">
 		/// Reference to the item to be copied.
 		/// </param>
@@ -908,6 +911,12 @@ namespace ActionEngine
 		/// Return the string value of the specified property within the caller's
 		/// File Action.
 		/// </summary>
+		/// <typeparam name="TAction">
+		/// The concrete type of action to consider.
+		/// </typeparam>
+		/// <typeparam name="TCollection">
+		/// The concrete type of collection matched to the action.
+		/// </typeparam>
 		/// <param name="actionItem">
 		/// Reference to the file action item to be inspected.
 		/// </param>
@@ -1056,6 +1065,10 @@ namespace ActionEngine
 		/// </summary>
 		/// <typeparam name="TAction">
 		/// The implemented action type for which the variables will be resolved.
+		/// </typeparam>
+		/// <typeparam name="TCollection">
+		/// The implemented action collection type for which the variables will be
+		/// resolved.
 		/// </typeparam>
 		/// <param name="expression">
 		/// The expression that might contain variable references in interpolated
