@@ -4,7 +4,7 @@
 
 | Version | Description |
 |---------|-------------|
-| 26.2117.4453 | Initial publication to GitHub. |
+| 26.2117.4453 | Initial publication to NuGet. |
 
 
 ## More Information

@@ -2,7 +2,7 @@
 
 Perform the following tasks when publishing a new version of *Dans.ActionEngine.Library*.
 
- - [ ] Make any changes necessary to **ReadMe.docx**.
+ - [ ] Make any changes necessary to **ReadMe.odt**.
  - [ ] Update **Docs/NuGetUpdates.md**. This step is required prior to compile because the file is included in the NuGet package.
  - [ ] Run **Scripts/CreateReadMe.cmd**.
  - [ ] Make sure the project is in **Debug** mode.

@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
     <Nullable>disable</Nullable>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
     <UserSecretsId>341060c9-2a0c-4950-a6a9-70316f23b6eb</UserSecretsId>
+    <Version>26.2117.4453</Version>
     <PackageId>Dans.ActionEngine.Library</PackageId>
     <Title>Dan's ActionEngine Library</Title>
-    <Version>26.2117.4453</Version>
     <Description>Dan's ActionEngine Library.</Description>
     <Copyright>Copyright(c) 2026. Daniel Patterson, MCSD (danielanywhere)</Copyright>
     <PackageProjectUrl>https://github.com/danielanywhere/ActionEngine</PackageProjectUrl>
