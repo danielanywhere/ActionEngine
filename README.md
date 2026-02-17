@@ -8,6 +8,56 @@ Among other things that will be documented soon, the following features are buil
 
 <p>&nbsp;</p>
 
+## Built-In Variables
+
+The following variables are built-in to the base **ActionItem**.
+
+-   **Action**. Not inheritable. The name of the action associated with this entry. See the Built-In Actions list below for a list of the automatically recognized actions. Add more actions by adding their names to the static **RecognizedActions** list and overriding the protected method **RunCustomAction()** as shown in the examples below.
+-   **Actions**. Not inheritable. A collection of child actions of the current action. Used in **Batch**, **ForEachFile**, **If**, and **RunSequence** actions.
+-   **Base**. Inheritable. A generic string used to set the base number or filename pattern of the source or target files, depending upon the action. Can be specified in the **CheckElements** function parameter. See the **CopyRange** method of **FileActionItem** in the [FileTools](https://github.com/danielanywhere/FileTools) repository.
+-   **Condition**. Inheritable. A string representing the condition expression for flow control on this action. Used in **If**.
+-   **ConfigFilename**. Not inheritable. The path and filename of the configuration file for this action. Used in **Batch**.
+-   **Count**. Inheritable. A generic count associated with the current action. Can be specified in the **CheckElements** function parameter.
+-   **CurrentFile**. Inheritable. A file info reference to the current active file in use.
+-   **DataDir**. Not inheritable. The internally calculated data directory info.
+-   **DataFilename**. Inheritable. The path and filename of the reference data file. Can be specified in the **CheckElements** function parameter.
+-   **DataFiles**. Inheritable. Reference to the list of FileInfo objects representing files used as reference in this session.
+-   **DataNames**. Inheritable. Reference to the list of filenames or folder names with or without wildcards. This parameter can be specified multiple times on the command line with different values to load multiple input files. Typically, this value corresponds with a command-line parameter 'DataFiles'.
+-   **DateTimeValue**. Inheritable. A generic date and time to be associated with the current action. Can be specified in the **CheckElements** function parameter.
+-   **DefaultVariables**. Not inheritable. List of Name/Value combinations representing default variable values assigned to this action. Although this list is not inheritable, a composite list of all variable values at the present and higher levels is checked when using the **GetVariable** function.
+-   **Digits**. Inheritable. The generic number of digits associated with the current action. Can be specified in the **CheckElements** function parameter.
+-   **Images**. Not inheritable. A list of images in this session.
+-   **InputDir**. Not inheritable. Reference to the internally calculated input directory info.
+-   **InputFilename**. Inheritable. The input path and filename of the input file.
+-   **InputFiles**. Inheritable. A reference to the collection of file information used as input in this session.
+-   **InputFolderName**. Inheritable. A generic folder name for operations where the folder is the focus of the operation, rather than a file.
+-   **InputNames**. Inheritable. A reference to the list of filenames or folder names with or without wildcards. Because it is a collection, this parameter can be specified multiple times on the command line with different values to load multiple input files.
+-   **Message**. Not inheritable. A message to be displayed when this action is run.
+-   **Options**. Not inheritable. A reference to the collection of options assigned to this action. Although this value is not inheritable, the named option anywhere between this level and any of its ancestors can be found by calling the **GetOptionByName** function.
+-   **OutputDir**. Inheritable. Reference to the internally calculated output directory info.
+-   **OutputFile**. Inheritable. Reference to the internally calculated output file info.
+-   **OutputFilename**. Inheritable. The output path and filename for this action.
+-   **OutputFolderName**. Inheritable. The output path and folder name for this action if the intent is for a folder instead of a file.
+-   **OutputName**. Inheritable. An output pattern that allows for filenames or folder names with or without wildcards.
+-   **Parent**. Not inheritable. The reference to the parent collection of this item. To retrieve the parent action, use an access similar to **this.Parent.Parent**.
+-   **Pattern**. Inheritable. A regular expression pattern for files, folders, or other appropriate strings.
+-   **Properties**. Not inheritable. A reference to the collection of Name/Value properties assigned to this action. Although this property is not inheritable, a property from this or any parent levels can be retrieved by calling the **GetPropertyByName** function.
+-   **Range**. Inheritable. A reference to the start and end values of a generic range. This value can be specified in the parameter of the **CheckElements** function parameter.
+-   **RecognizedActions**. Static. Not inheritable. Reference to a collection of all recognized action names in this session. If you wish to add customized actions, add the name of that action to **RecognizedActions**, then process for its presence by overriding the protected method **RunCustomAction**. as shown in the examples below. Alternatively, because the built-in actions are loaded into the list during initialization, you can also avoid processing of any of those actions by removing their names from the list before processing.
+-   **Sequences**. Inheritable. The collection of sequences defined for this action. Used by **RunSequence**.
+-   **SourceDir**. Not inheritable. Internally calculated generic source directory info.
+-   **SourceFolderName**. Inheritable. The path and folder name of the data source for this action.
+-   **Stop**. Inheritable. A value indicating whether the process should be stopped at this action.
+-   **Text**. Inheritable. The generic text of the current action.
+-   **VariableName**. Inheritable. The name of the variable to access in this action.
+-   **Variables**. Combinatorially inherited. A reference to the collection of variables on this instance.
+-   **WorkingDocument**. Inheritable. A reference to the working key file for operations in this instance.
+-   **WorkingDocumentIndex**. Inheritable. The input file index representing the working document.
+-   **WorkingImage**. Not inheritable. A reference to the current working image in this session.
+-   **WorkingPath**. Inheritable. The working path for operations in this instance. If the working path is set, any of the input and output filenames can optionally be expressed as relative values.
+
+<p>&nbsp;</p>
+
 ## Built-In Actions
 
 The following actions are built-in to the **Action** property of the Action item base.
@@ -22,9 +72,9 @@ The following actions are built-in to the **Action** property of the Action item
 -   **If**. Run one or more sets of actions if their conditions are true. In this version, each condition is an expression that evaluates to true or false, able to use the public static methods of System.Math, and the values of the local variables CurrentFilename and CurrentFileNumber.
 -   **ImageBackground**. Set the background color of the working image, overlaying the previous contents to create the new background.
 -   **ImagesClear**. Clear all images from the Images collection.
--   **OpenWorkingDocument**. Open the working document. In this version, the working document is seen as being a transitive document. In other words, its purpose is slightly different than either the input or output files in that multiple input files might be used to apply changes to the working document, and the working document itself might be converted before being saved as the output document.
+-   **OpenWorkingDocument**. Open the working document. This is a blank protected virtual void method you implement yourself to create a derivative of an ActionDocumentItem that is assigned to the built-in WorkingDocument variable at the current level (see example below). In this version, the working document is seen as being a transitive document. In other words, its purpose is slightly different than either the input or output files in that multiple input files might be used to apply changes to the working document, and the working document itself might be converted before being saved as the output document.
 -   **RunSequence**. Run the sequence specified in the 'SequenceName' user property.
--   **SaveWorkingDocument**. Save the working document.
+-   **SaveWorkingDocument**. Save the working document. This is a blank protected virtual void method you implement yourself to save the derivative of an ActionDocumentItem that was assigned to the built-in WorkingDocument variable at the current level (see example below).
 -   **SetWorkingImage**. Set the current working image to the one with the local name found in the user property ImageName.
 -   **SizeImage**. Scale the image to a new size, as specified in user properties Width and Height.
 
@@ -554,5 +604,209 @@ namespace AudioProcessor
 
 
 }
+
+```
+
+<p>&nbsp;</p>
+
+## Working Document Example
+
+The [SlideTools](https://github.com/danielanywhere/SlideTools) application for managing PowerPoint files at the repository https://github.com/danielanywhere/SlideTools demonstrates one method for opening and saving the working document while keeping the using the built-in WorkingDocumentIndex as an active index into the built-in InputFiles collection.
+
+<p>&nbsp;</p>
+
+### ActionDocumentItem Implementation
+
+The WorkingDocument built-in variable is based upon an ActionDocumentItem. The following block demonstrates the specialization used for SlideTools.
+
+```csharp
+//*-------------------------------------------------------------------------*
+//* SlideWorkingDocumentItem                                                *
+//*-------------------------------------------------------------------------*
+/// <summary>
+/// Information about an individual PowerPoint style working document.
+/// </summary>
+public class SlideWorkingDocumentItem : ActionDocumentItem
+{
+  //*************************************************************************
+  //* Private                                                               *
+  //*************************************************************************
+  //*************************************************************************
+  //* Protected                                                             *
+  //*************************************************************************
+  //*************************************************************************
+  //* Public                                                                *
+  //*************************************************************************
+  //*-----------------------------------------------------------------------*
+  //* _Constructor                                                          *
+  //*-----------------------------------------------------------------------*
+  /// <summary>
+  /// Create a new instance of the SlideWorkingDocumentItem item.
+  /// </summary>
+  public SlideWorkingDocumentItem()
+  {
+  }
+  //*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+  /// <summary>
+  /// Create a new instance of the SlideWorkingDocumentItem item.
+  /// </summary>
+  /// <param name="filename">
+  /// The fully qualified path and filename of the document.
+  /// </param>
+  public SlideWorkingDocumentItem(string filename)
+  {
+    Name = filename;
+    InitializeDocument(filename);
+  }
+  //*-----------------------------------------------------------------------*
+
+  //*-----------------------------------------------------------------------*
+  //*  InitializeDocument                                                   *
+  //*-----------------------------------------------------------------------*
+  /// <summary>
+  /// Initialize the document object.
+  /// </summary>
+  /// <param name="filename">
+  /// Fully qualified path a filename of the document to load.
+  /// </param>
+  public void InitializeDocument(string filename)
+  {
+
+    if(filename?.Length > 0)
+    {
+      try
+      {
+        using(FileStream fileStream = File.OpenRead(filename))
+        {
+          using(MemoryStream memoryStream = new MemoryStream())
+          {
+            fileStream.CopyTo(memoryStream);
+            memoryStream.Position = 0;
+            mPresentation = new ShapeCrawler.Presentation(memoryStream);
+          }
+        }
+      }
+      catch(Exception ex)
+      {
+        Trace.WriteLine($"Error loading PowerPoint: {ex.Message}",
+          $"{MessageImportanceEnum.Err}");
+      }
+    }
+  }
+  //*-----------------------------------------------------------------------*
+
+  //*-----------------------------------------------------------------------*
+  //*  Presentation                                                         *
+  //*-----------------------------------------------------------------------*
+  /// <summary>
+  /// Private member for <see cref="Presentation">Presentation</see>.
+  /// </summary>
+  private ShapeCrawler.Presentation mPresentation = null;
+  /// <summary>
+  /// Get/Set a reference to the ShapeCrawler presentation data object model
+  /// representing the loaded document.
+  /// </summary>
+  public ShapeCrawler.Presentation Presentation
+  {
+    get { return mPresentation; }
+    set { mPresentation = value; }
+  }
+  //*-----------------------------------------------------------------------*
+
+}
+//*-------------------------------------------------------------------------*
+
+
+```
+
+<p>&nbsp;</p>
+
+### Open the Working Document
+
+The following example from SlideTools demonstrates opening the working document from the script-specified location in the InputFiles list.
+
+```csharp
+//*-----------------------------------------------------------------------*
+//* OpenWorkingDocument                                                   *
+//*-----------------------------------------------------------------------*
+/// <summary>
+/// Open the working file to allow multiple operations to be completed
+/// in the same session.
+/// </summary>
+protected override void OpenWorkingDocument()
+{
+  string content = "";
+  ActionDocumentItem doc = null;
+  int docIndex = 0;
+
+  if(CheckElements(this,
+    ActionElementEnum.InputFilename))
+  {
+    // Load the document if a filename was specified.
+    docIndex = WorkingDocumentIndex;
+    if(docIndex > -1 && docIndex < InputFiles.Count)
+    {
+      WorkingDocument =
+        new SlideWorkingDocumentItem(InputFiles[docIndex].FullName);
+      Trace.WriteLine(
+        $" Working document: {this.InputFiles[docIndex].Name}",
+        $"{MessageImportanceEnum.Info}");
+    }
+    else
+    {
+      Trace.WriteLine(
+        $" Working document index out of range at: {docIndex}",
+        $"{MessageImportanceEnum.Warn}");
+    }
+  }
+}
+//*-----------------------------------------------------------------------*
+
+```
+
+<p>&nbsp;</p>
+
+### Save the Working Document
+
+In the SlideTools application, the working document is saved through [ShapeCrawler's](https://github.com/ShapeCrawler/ShapeCrawler) Presentation object.
+
+```csharp
+//*-----------------------------------------------------------------------*
+//* SaveWorkingDocument                                                   *
+//*-----------------------------------------------------------------------*
+/// <summary>
+/// Save the working file to the specified output file.
+/// </summary>
+protected override void SaveWorkingDocument()
+{
+  if(WorkingDocument != null &&
+    WorkingDocument is SlideWorkingDocumentItem workingDocument &&
+    CheckElements(this, ActionElementEnum.OutputFilename))
+  {
+    // Document is open and output file has been specified.
+    try
+    {
+      using(MemoryStream memoryStream = new MemoryStream())
+      {
+        workingDocument.Presentation.Save(memoryStream);
+        using(FileStream fileStream = File.Create(OutputFile.FullName))
+        {
+          memoryStream.Position = 0;
+          memoryStream.CopyTo(fileStream);
+        }
+      }
+      Trace.WriteLine($" Document saved to: {OutputFile.Name}",
+        $"{MessageImportanceEnum.Info}");
+    }
+    catch(Exception ex)
+    {
+      Trace.WriteLine(
+        $"Error while saving document: {OutputFile.Name}\r\n" +
+        $"  {ex.Message}",
+        $"{MessageImportanceEnum.Err}");
+    }
+  }
+}
+//*-----------------------------------------------------------------------*
 
 ```

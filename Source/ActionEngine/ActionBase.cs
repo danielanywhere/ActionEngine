@@ -2099,6 +2099,9 @@ namespace ActionEngine
 		/// <summary>
 		/// Get/Set the condition for flow control on this action.
 		/// </summary>
+		/// <remarks>
+		/// This value is inheritable.
+		/// </remarks>
 		public string Condition
 		{
 			get
@@ -2646,7 +2649,7 @@ namespace ActionEngine
 		/// Get/Set the internal, calculated input directory.
 		/// </summary>
 		/// <remarks>
-		/// This property is non-inerhitable.
+		/// This property is non-inheritable.
 		/// </remarks>
 		[JsonIgnore]
 		public DirectoryInfo InputDir
@@ -2981,9 +2984,7 @@ namespace ActionEngine
 		private string mOutputName = null;
 		/// <summary>
 		/// Get/Set an output pattern that allows for filenames or foldernames
-		/// with or without wildcards. This parameter can be specified muliple
-		/// times on the command line with different values to write to multiple
-		/// output files.
+		/// with or without wildcards.
 		/// </summary>
 		/// <remarks>
 		/// <para>This property is inheritable.</para>
@@ -3398,7 +3399,7 @@ namespace ActionEngine
 		/// Get a reference to the collection of sequences defined for this action.
 		/// </summary>
 		/// <remarks>
-		/// This property is not inheritable.
+		/// This property is inheritable.
 		/// </remarks>
 		public SequenceCollection<TAction> Sequences
 		{
