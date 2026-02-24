@@ -817,7 +817,7 @@ protected override void SaveWorkingDocument()
 | Version | Description |
 |---------|-------------|
 | 26.2117.4453 | Initial publication to NuGet. |
-
+| 26.2224.4542 | The **GetSpecifiedOrWorking** function has been renamed to **GetWorkingDocument**, which contains a call to the **OpenWorkingDocument** method that executes if the document hasn't yet been loaded. |
 
 ## More Information
 

@@ -2547,46 +2547,6 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
-		//* GetSpecifiedOrWorking																									*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Return a reference either to the document specified in the local file
-		/// arguments or the previously loaded working document.
-		/// </summary>
-		/// <param name="item">
-		/// Reference to the action item within which the file arguments will
-		/// be found.
-		/// </param>
-		/// <returns>
-		/// Reference to the document found, if successul. Otherwise, null.
-		/// </returns>
-		public static ActionDocumentItem GetSpecifiedOrWorking(TAction item)
-		{
-			string content = "";
-			ActionDocumentItem doc = null;
-
-			//	TODO: Specified or working method needs work.
-			if(item != null)
-			{
-				if(CheckElements(item,
-					ActionElementEnum.InputFilename |
-					ActionElementEnum.OutputFilename,
-					includeInherited: false, quiet: true))
-				{
-					////	Just load the document if the filenames were specified.
-					//content = File.ReadAllText(item.InputFiles[0].FullName);
-					//doc = new SvgDocumentItem(content);
-				}
-				else
-				{
-					doc = item.WorkingDocument;
-				}
-			}
-			return doc;
-		}
-		//*-----------------------------------------------------------------------*
-
-		//*-----------------------------------------------------------------------*
 		//* GetVariable																														*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -2616,6 +2576,38 @@ namespace ActionEngine
 				{
 					result = variable.Value;
 				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* GetWorkingDocument																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a reference either to the document specified in the local file
+		/// arguments or the previously loaded working document.
+		/// </summary>
+		/// <param name="item">
+		/// Reference to the action item within which the file arguments will
+		/// be found.
+		/// </param>
+		/// <returns>
+		/// Reference to the document found, if successul. Otherwise, null.
+		/// </returns>
+		public static ActionDocumentItem GetWorkingDocument(TAction item)
+		{
+			string content = "";
+			ActionDocumentItem result = null;
+
+			//	TODO: Specified or working method needs work.
+			if(item != null)
+			{
+				if(item.WorkingDocument == null)
+				{
+					item.OpenWorkingDocument();
+				}
+				result = item.WorkingDocument;
 			}
 			return result;
 		}
