@@ -36,7 +36,7 @@
       <DocumentationSource sourceFile="..\Source\ActionEngine\bin\Release\netstandard2.1\ActionEngine.dll" />
     </DocumentationSources>
     <HelpTitle>Dan&amp;#39%3bs ActionEngine Library</HelpTitle>
-    <HelpFileVersion>26.2224.4542</HelpFileVersion>
+    <HelpFileVersion>26.2723.3653</HelpFileVersion>
     <NamingMethod>MemberName</NamingMethod>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <RootNamespaceContainer>False</RootNamespaceContainer>

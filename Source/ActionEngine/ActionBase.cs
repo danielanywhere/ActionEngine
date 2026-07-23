@@ -1613,7 +1613,11 @@ namespace ActionEngine
 								GetPropertyByName(item,
 									nameof(WorkingPath)), item.mInputFilename));
 						//item.mInputNames.Add(item.mInputFilename);
-						item.mInputFilename = "";
+						if(item.mInputNames.Count > 0)
+						{
+							//	Only remove the original name if physical files were found.
+							item.mInputFilename = "";
+						}
 					}
 					if(item.mInputFolderName?.Length > 0)
 					{
@@ -2652,8 +2656,38 @@ namespace ActionEngine
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* InputFileFound																												*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the named input file was found
+		/// at this level.
+		/// </summary>
+		/// <param name="action">
+		/// Reference to the action for which the test is being made.
+		/// </param>
+		/// <returns>
+		/// True if the input file was either not specified or was found during
+		/// initialization. Otherwise false.
+		/// </returns>
+		public static bool InputFileFound(TAction action)
+		{
+			bool result = true;
+
+			if(action?.mInputFilename?.Length > 0 &&
+				action.mInputNames.Count == 0)
+			{
+				result = false;
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	InputFilename																													*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="InputFilename">InputFilename</see>.
+		/// </summary>
 		private string mInputFilename = null;
 		/// <summary>
 		/// Get/Set the input path and filename of the input file.
@@ -3178,6 +3212,10 @@ namespace ActionEngine
 			//	TODO: Create an error exit routine...
 			//	Decide which errors require exit and which can just be reported.
 
+			if(this.Action == "MakeConfigADHD")
+			{
+				Debug.WriteLine("ActionItemBase.Run: Break here...");
+			}
 			if(mWorkingPathLast != WorkingPath)
 			{
 				Trace.WriteLine($"Working Path: {WorkingPath}",

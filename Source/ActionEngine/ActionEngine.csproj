@@ -5,7 +5,7 @@
     <Nullable>disable</Nullable>
     <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
     <UserSecretsId>341060c9-2a0c-4950-a6a9-70316f23b6eb</UserSecretsId>
-    <Version>26.2224.4542</Version>
+    <Version>26.2723.3653</Version>
     <PackageId>Dans.ActionEngine.Library</PackageId>
     <Title>Dan's ActionEngine Library</Title>
     <Description>Dan's ActionEngine Library.</Description>
